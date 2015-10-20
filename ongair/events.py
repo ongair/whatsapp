@@ -1,4 +1,5 @@
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_presence.protocolentities.presence_available import AvailablePresenceProtocolEntity
 from util import get_env
 from pubnub import Pubnub
 import logging, requests, json
@@ -8,6 +9,15 @@ logger = logging.getLogger(__name__)
 class EventLayer(YowInterfaceLayer):
 
   EVENTS_CREDENTIALS="ongair.events.credentials"
+
+  @ProtocolEntityCallback("success")
+  def onSuccess(self, entity):
+    self.connected = True
+    self._post('status', { 'status': 1, 'message' : 'Connected' })
+
+    entity = AvailablePresenceProtocolEntity()
+    self.toLower(entity)
+
 
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
