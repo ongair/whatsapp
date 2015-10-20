@@ -19,22 +19,12 @@ class Job(Base):
   targets = Column(String())
   args = Column(String())
   sent = Column(Boolean())
-  scheduled_time = Column(DateTime())
   whatsapp_message_id = Column(String(255))
-  received = Column(String(255))
+  received = Column(String(Boolean()))
   receipt_timestamp = Column(DateTime())
   message_id = Column(Integer)
-  broadcast_part_id = Column(Integer)
   account_id = Column(Integer)
-  runs = Column(Integer)
-  next_job_id = Column(Integer)
-  asset_id = Column(Integer)
-  off_line = Column(Boolean())
+  runs = Column(Integer)  
+  asset_id = Column(Integer)  
   pending = Column(Boolean())
-
-  def __init__(self, method, targets, sent, args, scheduled_time):
-    self.method = method
-    self.targets = targets
-    self.sent = sent
-    self.args = args
-    self.scheduled_time = scheduled_time
+  state = Column(String())

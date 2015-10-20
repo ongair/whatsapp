@@ -8,12 +8,12 @@ logger = logging.getLogger(__name__)
 
 class EventLayer(YowInterfaceLayer):
 
-  EVENTS_CREDENTIALS="ongair.events.credentials"
-
   @ProtocolEntityCallback("success")
   def onSuccess(self, entity):
     self.connected = True
+    self.phone_number = self.getProp('ongair.account')
     self._post('status', { 'status': 1, 'message' : 'Connected' })
+    self.init()
 
     entity = AvailablePresenceProtocolEntity()
     self.toLower(entity)
@@ -36,11 +36,6 @@ class EventLayer(YowInterfaceLayer):
   @ProtocolEntityCallback("receipt")
   def onReceipt(self, entity):
     self.toLower(entity.ack())
-
-  def onEvent(self, event):
-    if event.getName() == EventLayer.EVENTS_CREDENTIALS:
-      self.phone_number = event.getArg('account')
-      self.init()
 
   def onMediaMessage(self, entity):
     by = entity.getFrom(False)
