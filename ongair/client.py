@@ -29,7 +29,7 @@ class Client:
 
   def loop(self):
     stackBuilder = YowStackBuilder()
-    stack = stackBuilder.pushDefaultLayers(False).push(YowParallelLayer((EventLayer, JobsLayer))).build()
+    stack = stackBuilder.pushDefaultLayers(False).push(JobsLayer).push(EventLayer).build()
 
     stack.setProp('ongair.account', self.phone_number)    
     stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])    #whatsapp server address

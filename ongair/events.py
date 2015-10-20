@@ -18,7 +18,6 @@ class EventLayer(YowInterfaceLayer):
     entity = AvailablePresenceProtocolEntity()
     self.toLower(entity)
 
-
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
     # send receipts lower

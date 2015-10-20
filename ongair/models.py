@@ -28,3 +28,10 @@ class Job(Base):
   asset_id = Column(Integer)  
   pending = Column(Boolean())
   state = Column(String())
+
+class Message(Base):
+  __tablename__ = 'messages'
+  id = Column(Integer, primary_key=True)
+  receipt_timestamp = Column(DateTime())
+  received = Column(Boolean())
+  account_id = Column(Integer())  

@@ -3,11 +3,14 @@ from yowsup.layers.interface                            import YowInterfaceLayer
 from yowsup.layers.network                              import YowNetworkLayer
 from yowsup.layers.protocol_messages.protocolentities   import TextMessageProtocolEntity
 from yowsup.layers.protocol_contacts.protocolentities   import GetSyncIqProtocolEntity, ResultSyncIqProtocolEntity
+from yowsup.layers.protocol_receipts.protocolentities   import OutgoingReceiptProtocolEntity
+from yowsup.layers.protocol_acks.protocolentities       import OutgoingAckProtocolEntity
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from util import get_env, post_to_server
-from models import Account, Job
+from models import Account, Job, Message
+from datetime import datetime
 
 import logging
 
@@ -25,6 +28,27 @@ class JobsLayer(YowInterfaceLayer):
   def onIq(self, entity):
     logger.info('ProtocolEntityCallback')
     self.work()
+
+  @ProtocolEntityCallback("receipt")
+  def onReceipt(self, entity):
+    ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", entity.getType(), entity.getFrom())    
+    self.toLower(ack)
+
+    id = entity.getId()
+    receipt_type = entity.getType()
+
+    _session = self.session()
+    job = _session.query(Job).filter_by(account_id= self.account.id, whatsapp_message_id=id, method= 'sendMessage').scalar()
+    if job is not None:
+      message = _session.query(Message).get(job.message_id)
+      if message is not None:
+          message.received = True
+          message.receipt_timestamp = datetime.now()          
+          _session.commit()          
+
+          if receipt_type == 'read':
+            data = { 'receipt' : { 'type' : 'read', 'message_id': message.id }}
+            post_to_server('receipt', self.phone_number, data)        
 
   def work(self):
     _session = self.session()
