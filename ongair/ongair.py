@@ -31,6 +31,7 @@ class OngairLayer(YowInterfaceLayer):
     entity = AvailablePresenceProtocolEntity()
     self.toLower(entity)
     self.work()
+    self.pingCount = 0
 
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
@@ -70,7 +71,12 @@ class OngairLayer(YowInterfaceLayer):
   @ProtocolEntityCallback("iq")
   def onIq(self, entity):
     logger.info('ProtocolEntityCallback')
+    self.pingCount += 1
     self.work()
+
+    if self.pingCount % 60:
+      logger.info('Going to send a re-connect')
+      self._post('status', { 'status': '1', 'message' : 'Connected' })    
 
   def onMediaMessage(self, entity):
     by = entity.getFrom(False)
