@@ -16,6 +16,7 @@ from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup import env
 from ongair import OngairLayer
+from stack import OngairStackBuilder
 
 class Client:  
 
@@ -27,8 +28,7 @@ class Client:
 
 
   def loop(self):
-    stackBuilder = YowStackBuilder()
-    # stack = stackBuilder.pushDefaultLayers(False).push(JobsLayer).push(EventLayer).build()
+    stackBuilder = OngairStackBuilder()
     stack = stackBuilder.pushDefaultLayers(False).push(OngairLayer).build()
 
     stack.setProp('ongair.account', self.phone_number)    
