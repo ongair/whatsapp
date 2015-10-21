@@ -13,24 +13,12 @@ from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup import env
+from notification import OngairYowNotificationsProtocolLayer
 import logging
+import sys, getopt, os, argparse
 
 
 class EchoLayer(YowInterfaceLayer):
-
-    @ProtocolEntityCallback("message")
-    def onMessage(self, messageProtocolEntity):
-        #send receipt otherwise we keep receiving the same message over and over
-
-        if True:
-            receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom(), 'read', messageProtocolEntity.getParticipant())
-
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(
-                messageProtocolEntity.getBody(),
-                to = messageProtocolEntity.getFrom())
-
-            self.toLower(receipt)
-            # self.toLower(outgoingMessageProtocolEntity)
 
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
@@ -38,13 +26,13 @@ class EchoLayer(YowInterfaceLayer):
         self.toLower(ack)
 
 
-CREDENTIALS = ("phone_number", "passwor") # replace with your phone and password
+CREDENTIALS = ("phone_number", "password") # replace with your phone and password
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__==  "__main__":
     layers = (
         EchoLayer,
-        (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer)
+        (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, OngairYowNotificationsProtocolLayer)
     ) + YOWSUP_CORE_LAYERS
 
     stack = YowStack(layers)
