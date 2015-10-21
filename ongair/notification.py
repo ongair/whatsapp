@@ -13,7 +13,7 @@ class OngairYowNotificationsProtocolLayer(YowProtocolLayer):
         super(OngairYowNotificationsProtocolLayer, self).__init__(handleMap)
 
     def __str__(self):
-        return "notification Ib Layer"
+        return "Ongair Notification Ib Layer"
 
     def sendNotification(self, entity):
         if entity.getTag() == "notification":

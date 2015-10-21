@@ -12,7 +12,6 @@ from yowsup.layers.protocol_receipts           import YowReceiptProtocolLayer
 from yowsup.layers.protocol_groups             import YowGroupsProtocolLayer
 from yowsup.layers.protocol_presence           import YowPresenceProtocolLayer
 from yowsup.layers.protocol_ib                 import YowIbProtocolLayer
-from yowsup.layers.protocol_notifications      import YowNotificationsProtocolLayer
 from yowsup.layers.protocol_iq                 import YowIqProtocolLayer
 from yowsup.layers.protocol_contacts           import YowContactsIqProtocolLayer
 from yowsup.layers.protocol_chatstate          import YowChatstateProtocolLayer
@@ -49,7 +48,7 @@ class OngairStackBuilder():
 
   def getDefaultLayers(self, groups = True, media = True, privacy = True, profiles = True):
     coreLayers = YowStackBuilder.getCoreLayers()
-    protocolLayers = YowStackBuilder.getProtocolLayers(groups = groups, media=media, privacy=privacy, profiles=profiles)
+    protocolLayers = self.getProtocolLayers(groups = groups, media=media, privacy=privacy, profiles=profiles)
 
     allLayers = coreLayers    
     allLayers += (YowParallelLayer(protocolLayers),)
@@ -57,7 +56,7 @@ class OngairStackBuilder():
     return allLayers
 
   def getProtocolLayers(self, groups = True, media = True, privacy = True, profiles = True):
-    layers = ONGAIR_YOWSUP_PROTOCOL_LAYERS_BASIC
+    layers = OngairStackBuilder.ONGAIR_YOWSUP_PROTOCOL_LAYERS_BASIC
     if groups:
       layers += (YowGroupsProtocolLayer,)
 
