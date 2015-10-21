@@ -9,7 +9,7 @@ class VideoUploadLayer(YowInterfaceLayer):
 
     # send receipts lower
     self.toLower(messageProtocolEntity.ack())
-    self.toLower(messageProtocolEntity.ack(True))
+    # self.toLower(messageProtocolEntity.ack(True))
     
 
   @ProtocolEntityCallback("receipt")

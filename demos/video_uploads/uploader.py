@@ -1,5 +1,5 @@
 import requests
-import redis
+# import redis
 import os
 import mandrill 
 from os.path import join, dirname
@@ -24,17 +24,24 @@ def save_file(url):
   token = result_json['token']
   return token
 
+def construct(email):
+  return { 'email': email }
 
 def email(url, phone_number):
   try:
     mandrill_client = mandrill.Mandrill(os.environ.get('mandrill_api_key').encode('utf8'))
+    cc_list = os.environ.get('video_ccc_email').encode('utf8').split(',')
+    cc_list.append(os.environ.get('video_to_email'))
+
+    mails = map(construct, cc_list)
+    print mails
     message = {
       'from_email' : os.environ.get('video_from_email').encode('utf8'),
       'from_name' : 'Ongair Media',
       'headers': {'Reply-To': os.environ.get('video_from_email').encode('utf8') },
-      'subject': 'Video from %s' %phone_number,
+      'subject': 'Persil Video from %s' %phone_number,
       'html': "<p>A video whas been sent to you via WhatsApp from %s.<br />Please download within 24 hours from <a href='%s'>here</a>.</p>" %(phone_number, url),
-      'to': [{ 'email': os.environ.get('video_to_email').encode('utf8') }]
+      'to' : mails
     }
 
     result = mandrill_client.messages.send(message=message, async=False, ip_pool='Main Pool') 

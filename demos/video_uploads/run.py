@@ -16,8 +16,9 @@ from yowsup import env
 from dotenv import load_dotenv
 import logging
 import sys, getopt, os
+from uploader import email
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def run(configfile):
   load_dotenv(configfile)
@@ -41,7 +42,6 @@ def run(configfile):
 
   stack.loop() #this is the program mainloop
   
-
 def main(argv):
   configfile = ''
  
