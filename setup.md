@@ -7,6 +7,7 @@
     sudo pip install yowsup2
     sudo pip install pubnub
     sudo pip install sqlalchemy
+    sudo pip install mandrill
   ```
 
 
