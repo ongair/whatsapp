@@ -15,8 +15,6 @@ from yowsup.layers import YowLayerEvent
 from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup import env
-# from events import EventLayer
-# from jobs import JobsLayer
 from ongair import OngairLayer
 
 class Client:  
