@@ -8,6 +8,7 @@
     sudo pip install pubnub
     sudo pip install sqlalchemy
     sudo pip install mandrill
+    sudo pip install python-dotenv
   ```
 
 
