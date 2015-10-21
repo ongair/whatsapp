@@ -41,7 +41,6 @@ class OngairYowNotificationsProtocolLayer(YowProtocolLayer):
             # Not implemented
             pass
         elif node['type'] == 'encrypt':
-            print "We are in the encrypt protocol entity"
             pass
         else:
             self.raiseErrorForNode(node)
