@@ -125,7 +125,7 @@ class OngairLayer(YowInterfaceLayer):
     job.sent = True
 
   def send(self, job, session):
-    messageEntity = TextMessageProtocolEntity(job.args, to = "%s@s.whatsapp.net" % job.targets)
+    messageEntity = TextMessageProtocolEntity(job.args.encode('utf8'), to = "%s@s.whatsapp.net" % job.targets)
     job.whatsapp_message_id = messageEntity.getId()
     job.sent = True    
     session.commit()
