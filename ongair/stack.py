@@ -1,5 +1,5 @@
-from yowsup.stacks import YowStackBuilder
-from yowsup.layers import YowLayer
+from yowsup.stacks import YowStackBuilder, YowStack
+from yowsup.layers import YowLayer, YowParallelLayer
 from yowsup.layers.auth                        import YowCryptLayer, YowAuthenticationProtocolLayer
 from yowsup.layers.coder                       import YowCoderLayer
 from yowsup.layers.logger                      import YowLoggerLayer
