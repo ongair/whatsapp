@@ -75,7 +75,7 @@ class OngairLayer(YowInterfaceLayer):
     self.pingCount += 1
     self.work()
 
-    if self.pingCount % 60:
+    if self.pingCount % 60 == 0:
       logger.info('Going to send a re-connect')
       self._post('status', { 'status': '1', 'message' : 'Connected' })    
 
