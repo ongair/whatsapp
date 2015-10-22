@@ -1,5 +1,7 @@
 import os, logging, json, requests
 
+logger = logging.getLogger(__name__)
+
 def get_env(key):
   return os.environ.get(key).encode('utf-8')
 
@@ -13,7 +15,10 @@ def setup_logging(phone_number):
     filemode='w')
 
 def post_to_server(url, phone_number, payload):
-  post_url = get_env('url') + url
-  payload.update(account = phone_number)
-  headers = { 'Content-Type' : 'application/json', 'Accept' : 'application/json' }
-  response = requests.post(post_url, data=json.dumps(payload), headers=headers)
+  try:
+    post_url = get_env('url') + url
+    payload.update(account = phone_number)
+    headers = { 'Content-Type' : 'application/json', 'Accept' : 'application/json' }
+    response = requests.post(post_url, data=json.dumps(payload), headers=headers)
+  except:
+    logger.info('Error with reaching the url %s' %url)
