@@ -164,7 +164,7 @@ class OngairLayer(YowInterfaceLayer):
       self.init()
     elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:
       logger.info('Disconnected. Will restart')
-      sys.exit(0)
+      sys.exit(2)
 
   def init(self):
     self.init_db()
@@ -177,7 +177,7 @@ class OngairLayer(YowInterfaceLayer):
       self.getStack().broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT)) 
     else:
       logger.info('Tried to run an account that is not active')
-      sys.exit(-1)
+      sys.exit(0)
 
   def get_account(self):
     sess = self.session()
