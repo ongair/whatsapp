@@ -39,9 +39,6 @@ class OngairLayer(YowInterfaceLayer):
     # send receipts lower
     self.toLower(messageProtocolEntity.ack())
 
-    # sends the read message
-    # self.toLower(messageProtocolEntity.ack(True))  
-
     if not messageProtocolEntity.isGroupMessage():
       if messageProtocolEntity.getType() == 'text':
         self.onTextMessage(messageProtocolEntity)
@@ -76,7 +73,7 @@ class OngairLayer(YowInterfaceLayer):
     self.work()
 
     if self.pingCount % 60 == 0:
-      logger.info('Going to send a re-connect')
+      logger.info('Send online signal to app.ongair.im')
       self._post('status', { 'status': '1', 'message' : 'Connected' })    
 
   def onMediaMessage(self, entity):
@@ -92,6 +89,8 @@ class OngairLayer(YowInterfaceLayer):
     by = entity.getFrom(False)
     id = entity.getId()
     name = entity.getNotify()
+
+    logger.info("Received message %s from %s" %(text, by))
 
     data = { "message" : { "text" : text, "phone_number" : by, "message_type" : "Text", "whatsapp_message_id" : id, "name" : name  }}
     self._post('messages', data)
