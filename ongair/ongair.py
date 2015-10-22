@@ -34,6 +34,12 @@ class OngairLayer(YowInterfaceLayer):
     self.work()
     self.pingCount = 0
 
+  @ProtocolEntityCallback("failure")
+  def onFailure(self, entity):
+    self.connected = False
+    logger.info("Login Failed, reason: %s" %entity.getReason())
+    sys.exit(-1)
+
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
     # send receipts lower
