@@ -144,7 +144,7 @@ class OngairLayer(YowInterfaceLayer):
     self._sendIq(entity, self.onHandleSetProfile, self.onHandleSetProfile)
     job.sent = True
 
-  def onHandleSetProfile(result, original):
+  def onHandleSetProfile(self, result, original):
     logger.info('Result from setting the profile %s' %result)
 
   def onGetSyncResult(self, resultSyncIqProtocolEntity, originalIqProtocolEntity):
@@ -170,9 +170,14 @@ class OngairLayer(YowInterfaceLayer):
     self.init_db()
     self._initRealtime()
     self.get_account()
-    self.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, (self.phone_number, self.account.whatsapp_password))
-    logger.info('About to login : %s' %self.account.name)
-    self.getStack().broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT)) 
+
+    if self.account.setup == True:
+      self.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, (self.phone_number, self.account.whatsapp_password))
+      logger.info('About to login : %s' %self.account.name)
+      self.getStack().broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT)) 
+    else:
+      logger.info('Tried to run an account that is not active')
+      sys.exit(-1)
 
   def get_account(self):
     sess = self.session()
