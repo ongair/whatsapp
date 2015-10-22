@@ -35,7 +35,7 @@ def main(argv):
       output = commands.getoutput("service ongair-%s status" %acc.phone_number)
 
       if "stop/waiting" in output:
-        output = command.getoutput("sudo service ongair-%s start" %acc.phone_number)
+        output = commands.getoutput("sudo service ongair-%s start" %acc.phone_number)
         print "Output: %s" %output
 
 
