@@ -162,8 +162,8 @@ class OngairLayer(YowInterfaceLayer):
     if event.getName() == OngairLayer.EVENT_LOGIN:
       self.phone_number = self.getProp('ongair.account')
       self.init()
-    elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:
-      logger.info('Disconnected. Will restart')
+    elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:      
+      logger.info('Disconnected. Will restart exit(2)')
       sys.exit(2)
 
   def init(self):
