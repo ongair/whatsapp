@@ -6,6 +6,7 @@ from yowsup.layers.protocol_messages.protocolentities   import TextMessageProtoc
 from yowsup.layers.protocol_contacts.protocolentities   import GetSyncIqProtocolEntity, ResultSyncIqProtocolEntity
 from yowsup.layers.protocol_receipts.protocolentities   import OutgoingReceiptProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities       import OutgoingAckProtocolEntity
+from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -113,6 +114,8 @@ class OngairLayer(YowInterfaceLayer):
         self.sync(job)
       elif job.method == 'sendMessage':
         self.send(job, _session)
+      elif job.method == 'profile_setStatus':
+        self.setProfile(job)
 
     _session.commit()
 
@@ -130,6 +133,14 @@ class OngairLayer(YowInterfaceLayer):
     job.sent = True    
     session.commit()
     self.toLower(messageEntity)
+
+  def setProfile(self, job):
+    entity = SetStatusIqProtocolEntity(job.args.encode('utf8'))
+    self._sendIq(entity, self.onHandleSetProfile, self.onHandleSetProfile)
+    job.sent = True
+
+  def onHandleSetProfile(result, original):
+    logger.info('Result from setting the profile %s' %result)
 
   def onGetSyncResult(self, resultSyncIqProtocolEntity, originalIqProtocolEntity):
     post_to_server('contacts/sync', self.phone_number, { 'registered' : resultSyncIqProtocolEntity.outNumbers.keys(), 'unregistered' : resultSyncIqProtocolEntity.invalidNumbers })
