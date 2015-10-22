@@ -8,7 +8,7 @@ def get_env(key):
 def setup_logging(phone_number):
   # logging.captureWarnings(True)
   env = get_env('env')  
-  logging.basicConfig(level=logging.INFO,
+  logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
     datefmt='%m-%d %H:%M',
     filename="%s/logs/%s.%s.log" %(get_env('pwd'), phone_number, env),
