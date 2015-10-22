@@ -78,7 +78,7 @@ class OngairLayer(YowInterfaceLayer):
     self.pingCount += 1
     self.work()
 
-    if self.pingCount % 60 == 0:
+    if self.pingCount % 10 == 0:
       logger.info('Send online signal to app.ongair.im')
       self._post('status', { 'status': '1', 'message' : 'Connected' })    
 
