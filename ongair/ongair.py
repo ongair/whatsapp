@@ -15,7 +15,7 @@ from models import Account, Job, Message
 from datetime import datetime
 from pubnub import Pubnub
 
-import logging, requests, json
+import logging, requests, json, sys
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +156,9 @@ class OngairLayer(YowInterfaceLayer):
     if event.getName() == OngairLayer.EVENT_LOGIN:
       self.phone_number = self.getProp('ongair.account')
       self.init()
+    elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:
+      logger.info('Disconnected. Will restart')
+      sys.exit(0)
 
   def init(self):
     self.init_db()
