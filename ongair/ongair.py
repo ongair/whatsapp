@@ -71,7 +71,7 @@ class OngairLayer(YowInterfaceLayer):
 
   @ProtocolEntityCallback("iq")
   def onIq(self, entity):
-    logger.info('ProtocolEntityCallback')
+    logger.info('ProtocolEntityCallback. Count is %s' %self.pingCount)
     self.pingCount += 1
     self.work()
 
