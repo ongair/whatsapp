@@ -10,7 +10,8 @@ import sys, getopt, os, argparse, commands
 def main(argv):
   parser = argparse.ArgumentParser(description='Description of your program')
   parser.add_argument('-c','--config', help='Path of the config file', required=True)
-  parser.add_argument('-m','--mode', help='Mode', required=True)
+  parser.add_argument('-m','--mode', help='Mode [check,start,activate]', required=True)
+  parser.add_argument('-a','--account', help='The phone number we want to activate', required=False)
 
   args = vars(parser.parse_args())
   load_dotenv(args['config'])
@@ -37,6 +38,26 @@ def main(argv):
       if "stop/waiting" in output:
         output = commands.getoutput("sudo service ongair-%s start" %acc.phone_number)
         print "Output: %s" %output
+  elif args['mode'] == "activate":
+    str = """
+description "Running Ongair via Python"
+
+env PYTHON_HOME=/data/apps/whatsapp/env
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+normal exit 0 1
+
+exec $PYTHON_HOME/bin/python -W 'ignore:Unverified HTTPS request' /data/apps/whatsapp/ongair/run.py -c /data/apps/whatsapp/.env -a <acc>
+
+respawn
+    """
+    account = args['account']
+    str = str.replace('<acc>', account)
+
+    service_file = open("%songair-%s.conf" %(get_env('service_dir'), account), "w")
+    service_file.write(str)
+    service_file.close()
 
 
 if __name__ == "__main__":
