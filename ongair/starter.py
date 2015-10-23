@@ -29,6 +29,15 @@ def main(argv):
 
       if "stop/waiting" in output:
         print "Account %s-%s needs to start" %(acc.phone_number, acc.name)
+  elif args['mode'] == "stop":
+    accounts = sess.query(Account).filter_by(setup= True).all()
+    print("Accounts : %s" % len(accounts))
+    for acc in accounts:
+      output = commands.getoutput("service ongair-%s status" %acc.phone_number)
+
+      if "start/running" in output:
+        output = commands.getoutput("sudo service ongair-%s stop" %acc.phone_number)
+        print "Output: %s" %output
   elif args['mode'] == "start":
     accounts = sess.query(Account).filter_by(setup= True).all()
     print("Accounts : %s" % len(accounts))
