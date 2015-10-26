@@ -38,7 +38,7 @@ class OngairLayer(YowInterfaceLayer):
   def onFailure(self, entity):
     self.connected = False
     logger.info("Login Failed, reason: %s" %entity.getReason())
-    sys.exit(-1)
+    sys.exit(0)
 
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
@@ -86,8 +86,9 @@ class OngairLayer(YowInterfaceLayer):
     by = entity.getFrom(False)
     id = entity.getId()
     name = entity.getNotify()
+    preview = None
     
-    data = { 'message' : { 'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by, 'whatsapp_message_id': id, 'name': name }}
+    data = { 'message' : { 'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by, 'whatsapp_message_id': id, 'name': name, 'caption': entity.getCaption(), 'preview' : entity.getPreview() }}
     self._post('upload', data)
 
   def onTextMessage(self, entity):

@@ -1,7 +1,8 @@
 ## Setup ##
-  Installation
+Installation
 
   ```
+    sudo apt-get update
     sudo apt-get install python-pip
     
     sudo apt-get install libmysqlclient-dev python-dev #python-dev only for ubuntu
@@ -16,7 +17,11 @@
     pip install -r requirements.txt
   ```
 
+## Running ##
 
   ```
     python ongair/run.py -h
+    sudo env/bin/python ongair/starter.py -c .env -m 'check'
+    sudo env/bin/python ongair/starter.py -c .env -m 'start'
   ```
+  
