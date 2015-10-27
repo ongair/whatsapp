@@ -57,7 +57,7 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 normal exit 0 1
 
-exec $PYTHON_HOME/bin/python -W 'ignore:Unverified HTTPS request' /data/apps/whatsapp/ongair/run.py -c /data/apps/whatsapp/.env -a <acc>
+exec $PYTHON_HOME/bin/python -W 'ignore:Unverified HTTPS request' <pwd>/ongair/run.py -c <pwd>/.env -a <acc>
 
 respawn
     """
