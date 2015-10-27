@@ -22,3 +22,11 @@ def post_to_server(url, phone_number, payload):
     response = requests.post(post_url, data=json.dumps(payload), headers=headers)
   except:
     logger.info('Error with reaching the url %s' %url)
+
+def send_sms(to, message):
+
+  try:
+    post_url = get_env('sms_gateway_url')    
+    requests.post(post_url, data={ 'phone_number' : to, 'message': message} )
+  except:
+    logger.info('Error with reaching the url %s' %post_url)
