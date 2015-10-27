@@ -88,7 +88,7 @@ class OngairLayer(YowInterfaceLayer):
     name = entity.getNotify()
     preview = None
     
-    data = { 'message' : { 'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by, 'whatsapp_message_id': id, 'name': name, 'caption': entity.getCaption(), 'preview' : entity.getPreview() }}
+    data = { 'message' : { 'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by, 'whatsapp_message_id': id, 'name': name, 'caption': entity.getCaption() }}
     self._post('upload', data)
 
   def onTextMessage(self, entity):
