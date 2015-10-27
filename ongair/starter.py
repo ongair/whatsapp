@@ -51,7 +51,7 @@ def main(argv):
     str = """
 description "Running Ongair via Python"
 
-env PYTHON_HOME=/data/apps/whatsapp/env
+env PYTHON_HOME=<pwd>/env
 
 start on runlevel [2345]
 stop on runlevel [!2345]
@@ -62,7 +62,9 @@ exec $PYTHON_HOME/bin/python -W 'ignore:Unverified HTTPS request' /data/apps/wha
 respawn
     """
     account = args['account']
+    pwd = get_env('pwd')
     str = str.replace('<acc>', account)
+    str = str.replace('<pwd>', pwd)
 
     service_file = open("%songair-%s.conf" %(get_env('service_dir'), account), "w")
     service_file.write(str)
