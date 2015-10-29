@@ -7,6 +7,7 @@ from yowsup.layers.protocol_contacts.protocolentities   import GetSyncIqProtocol
 from yowsup.layers.protocol_receipts.protocolentities   import OutgoingReceiptProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities       import OutgoingAckProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
+from yowsup.layers.protocol_profiles.protocolentities import SetPictureIqProtocolEntity
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -14,6 +15,7 @@ from util import get_env, post_to_server
 from models import Account, Job, Message
 from datetime import datetime
 from pubnub import Pubnub
+from PIL import Image
 
 import logging, requests, json, sys
 
@@ -121,7 +123,9 @@ class OngairLayer(YowInterfaceLayer):
       elif job.method == 'sendMessage':
         self.send(job, _session)
       elif job.method == 'profile_setStatus':
-        self.setProfile(job)
+        self.setProfileStatus(job)
+      elif job.method == "setProfilePicture":
+        self.setProfilePicture(job)
 
     _session.commit()
 
@@ -140,12 +144,22 @@ class OngairLayer(YowInterfaceLayer):
     session.commit()
     self.toLower(messageEntity)
 
-  def setProfile(self, job):
+  def setProfileStatus(self, job):
     entity = SetStatusIqProtocolEntity(job.args.encode('utf8'))
-    self._sendIq(entity, self.onHandleSetProfile, self.onHandleSetProfile)
+    self._sendIq(entity, self.onHandleSetProfileStatus, self.onHandleSetProfileStatus)
     job.sent = True
 
-  def onHandleSetProfile(self, result, original):
+
+  def setProfilePicture(self, job):
+    url = "%s%s" %(get_env('url'), job.args)
+    logger.info('Setting profile to %s' %url)
+    # job.sent = True
+
+  # handlers
+  def onHandleSetProfilePicture(self, result, original):
+    logger.info('Result from setting the profile picture %s' %result)
+
+  def onHandleSetProfileStatus(self, result, original):
     logger.info('Result from setting the profile %s' %result)
 
   def onGetSyncResult(self, resultSyncIqProtocolEntity, originalIqProtocolEntity):
