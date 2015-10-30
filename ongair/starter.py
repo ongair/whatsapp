@@ -42,10 +42,10 @@ def main(argv):
     accounts = sess.query(Account).filter_by(setup= True).all()
     print("Accounts : %s" % len(accounts))
     for acc in accounts:
-      output = commands.getoutput("service ongair-%s status" %acc.phone_number)
+      output = commands.getoutput("/sbin/initctl status ongair-%s" %acc.phone_number)
 
       if "stop/waiting" in output:
-        output = commands.getoutput("sudo service ongair-%s start" %acc.phone_number)
+        output = commands.getoutput("sudo /sbin/initctl start start ongair-%s" %acc.phone_number)
         print "Output: %s" %output
   elif args['mode'] == "activate":
     str = """
