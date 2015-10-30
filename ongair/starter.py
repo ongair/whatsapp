@@ -45,7 +45,7 @@ def main(argv):
       output = commands.getoutput("/sbin/initctl status ongair-%s" %acc.phone_number)
 
       if "stop/waiting" in output:
-        output = commands.getoutput("sudo /sbin/initctl start start ongair-%s" %acc.phone_number)
+        output = commands.getoutput("sudo /sbin/initctl start ongair-%s" %acc.phone_number)
         print "Output: %s" %output
   elif args['mode'] == "activate":
     str = """
