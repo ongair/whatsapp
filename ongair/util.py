@@ -1,9 +1,19 @@
-import os, logging, json, requests
+import os, logging, json, requests, posixpath, urlparse, urllib
 
 logger = logging.getLogger(__name__)
 
 def get_env(key):
   return os.environ.get(key).encode('utf-8')
+
+def get_filename(url):
+  path = urlparse.urlsplit(url).path
+  return posixpath.basename(path)
+
+def download(url):
+  filename = get_filename(url)
+  logger.info("About to download %s to tmp/%s" %(url, filename))
+  urllib.urlretrieve (url, "tmp/%s" %filename)
+  return "tmp/%s" %filename
 
 def setup_logging(phone_number):
   # logging.captureWarnings(True)

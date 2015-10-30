@@ -11,7 +11,7 @@ from yowsup.layers.protocol_profiles.protocolentities import SetPictureIqProtoco
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from util import get_env, post_to_server
+from util import get_env, post_to_server, download
 from models import Account, Job, Message
 from datetime import datetime
 from pubnub import Pubnub
@@ -152,8 +152,14 @@ class OngairLayer(YowInterfaceLayer):
 
   def setProfilePicture(self, job):
     url = "%s%s" %(get_env('url'), job.args)
-    logger.info('Setting profile to %s' %url)
-    # job.sent = True
+    file = download(url)
+
+    src = Image.open(file)
+    pictureData = src.resize((480, 480)).tobytes("jpeg", "RGB")
+    picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
+    iq = SetPictureIqProtocolEntity(self.getOwnJid(), picturePreview, pictureData)
+    self._sendIq(iq, self.onHandleSetProfilePicture, self.onHandleSetProfilePicture)
+    job.sent = True
 
   # handlers
   def onHandleSetProfilePicture(self, result, original):
