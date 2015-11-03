@@ -9,8 +9,11 @@ def get_filename(url):
   path = urlparse.urlsplit(url).path
   return posixpath.basename(path)
 
-def download(url):
-  filename = get_filename(url)
+def download(url, name=None):
+  if name is None:
+    filename = get_filename(url)
+  else:
+    filename = name
   logger.info("About to download %s to tmp/%s" %(url, filename))
   urllib.urlretrieve (url, "tmp/%s" %filename)
   return "tmp/%s" %filename
@@ -40,3 +43,11 @@ def send_sms(to, message):
     requests.post(post_url, data={ 'phone_number' : to, 'message': message} )
   except:
     logger.info('Error with reaching the url %s' %post_url)
+
+def normalizeJid(number):
+  if '@' in number:
+    return number
+  elif "-" in number:
+    return "%s@g.us" % number
+
+  return "%s@s.whatsapp.net" % number
