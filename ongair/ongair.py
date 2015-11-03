@@ -8,11 +8,14 @@ from yowsup.layers.protocol_receipts.protocolentities   import OutgoingReceiptPr
 from yowsup.layers.protocol_acks.protocolentities       import OutgoingAckProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetPictureIqProtocolEntity
+from yowsup.layers.protocol_media.protocolentities    import RequestUploadIqProtocolEntity
+from yowsup.layers.protocol_media.protocolentities    import ImageDownloadableMediaMessageProtocolEntity
+from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from util import get_env, post_to_server, download
-from models import Account, Job, Message
+from util import get_env, post_to_server, download, normalizeJid
+from models import Account, Job, Message, Asset
 from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
@@ -126,6 +129,8 @@ class OngairLayer(YowInterfaceLayer):
         self.setProfileStatus(job)
       elif job.method == "setProfilePicture":
         self.setProfilePicture(job)
+      elif job.method == 'sendImage':
+        self.sendImage(job)
 
     _session.commit()
 
@@ -161,7 +166,51 @@ class OngairLayer(YowInterfaceLayer):
     self._sendIq(iq, self.onHandleSetProfilePicture, self.onHandleSetProfilePicture)
     job.sent = True
 
+  def sendImage(self, job):
+    _session = self.session()
+    asset = _session.query(Asset).get(job.args)
+    name = asset.get_image_file_name()
+    
+    logger.info('about to download %s' %name)
+    path = download(asset.url, name)
+
+    jid = normalizeJid(job.targets)
+    entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
+    successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, 'Hi')
+    errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
+
+    self._sendIq(entity, successFn, errorFn)    
+    job.sent = True
+
+  def doSendImage(self, filePath, url, to, ip = None):
+    entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to)
+    self.toLower(entity)
+
+
   # handlers
+  def onRequestUploadResult(self, jid, path, result, original, caption):
+    if result.isDuplicate():
+      self.doSendImage(filePath, result.getUrl(), jid, result.getIp())
+    else:
+      # successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, jid, url, resultRequestUploadIqProtocolEntity.getIp())
+      mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
+        result.getUrl(),
+        result.getResumeOffset(),
+        self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
+      mediaUploader.start()
+    
+  def onUploadSuccess(self, filePath, jid, url):
+    self.doSendImage(filePath, url, jid)
+
+  def onUploadError(self, filePath, jid, url):
+    logger.info("Upload file %s to %s for %s failed!" % (filePath, url, jid))
+
+  def onUploadProgress(self, filePath, jid, url, progress):
+    return None    
+
+  def onRequestUploadError(self, jid, path, result, original):
+    logger.info('Error with uploading image %s' %path)
+
   def onHandleSetProfilePicture(self, result, original):
     logger.info('Result from setting the profile picture %s' %result)
 
