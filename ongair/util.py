@@ -25,7 +25,7 @@ def setup_logging(phone_number):
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
     datefmt='%m-%d %H:%M',
     filename="%s/logs/%s.%s.log" %(get_env('pwd'), phone_number, env),
-    filemode='w')
+    filemode='a')
 
 def post_to_server(url, phone_number, payload):
   try:
