@@ -1,4 +1,6 @@
 .env
+.env.prod
+.cc
 *.pyc
 build
 env

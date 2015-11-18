@@ -156,7 +156,7 @@ class OngairLayer(YowInterfaceLayer):
 
 
   def setProfilePicture(self, job):
-    url = "%s%s" %(get_env('url'), job.args)
+    url = job.args
     file = download(url)
 
     src = Image.open(file)
