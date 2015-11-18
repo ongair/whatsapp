@@ -4,7 +4,7 @@ from util import get_env
 from client import Client
 
 def run(account):
-  client = Client(account)
+  client = Client(account, get_env('encrypted'))
   client.loop()
 
 def main(argv):

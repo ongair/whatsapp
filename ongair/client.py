@@ -20,20 +20,31 @@ from stack import OngairStackBuilder
 
 class Client:  
 
-  def __init__(self, phone_number):
+  def __init__(self, phone_number, encrypted=False):
     self.connected = False
+    self.encrypted = encrypted
     self.phone_number = phone_number
 
     setup_logging(phone_number)
 
 
   def loop(self):
-    stackBuilder = OngairStackBuilder()
-    stack = stackBuilder.pushDefaultLayers().push(OngairLayer).build()
+    if self.encrypted:
+        stackBuilder = YowStackBuilder()
+        stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build()
+        stack.setProp('ongair.account', self.phone_number)    
+        stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])    #whatsapp server address
+        stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)              
+        stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())          #info about us as WhatsApp client
+        stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))
+        stack.loop(timeout = 5, discrete = 0.5) #this is the program mainloop
+    else:
+        stackBuilder = OngairStackBuilder()
+        stack = stackBuilder.pushDefaultLayers().push(OngairLayer).build()
 
-    stack.setProp('ongair.account', self.phone_number)    
-    stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])    #whatsapp server address
-    stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)              
-    stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())          #info about us as WhatsApp client
-    stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))
-    stack.loop(timeout = 5, discrete = 0.5) #this is the program mainloop
+        stack.setProp('ongair.account', self.phone_number)    
+        stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])    #whatsapp server address
+        stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)              
+        stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())          #info about us as WhatsApp client
+        stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))
+        stack.loop(timeout = 5, discrete = 0.5) #this is the program mainloop
