@@ -43,6 +43,11 @@ class OngairLayer(YowInterfaceLayer):
   def onFailure(self, entity):
     self.connected = False
     logger.info("Login Failed, reason: %s" %entity.getReason())
+    if entity.getReason() == "not-authorized":
+      _session = self.session()
+      self.account.setup = False      
+      _session.commit()
+
     sys.exit(0)
 
   @ProtocolEntityCallback("message")
