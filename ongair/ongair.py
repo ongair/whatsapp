@@ -179,6 +179,8 @@ class OngairLayer(YowInterfaceLayer):
     logger.info('about to download %s' %name)
     path = download(asset.url, name)
 
+    logger.info('Downloaded file to %s' %path)
+
     jid = normalizeJid(job.targets)
     entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
     successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, 'Hi')
@@ -187,8 +189,9 @@ class OngairLayer(YowInterfaceLayer):
     self._sendIq(entity, successFn, errorFn)    
     job.sent = True
 
-  def doSendImage(self, filePath, url, to, ip = None):
-    entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to)
+
+  def doSendImage(self, filePath, url, to, ip = None, caption=None):
+    entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to, caption = caption)
     self.toLower(entity)
 
 
@@ -198,10 +201,17 @@ class OngairLayer(YowInterfaceLayer):
       self.doSendImage(filePath, result.getUrl(), jid, result.getIp())
     else:
       # successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, jid, url, resultRequestUploadIqProtocolEntity.getIp())
+      # mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
+      #   result.getUrl(),
+      #   result.getResumeOffset(),
+      #   self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
+      # mediaUploader.start()
+
+      successFn = lambda filePath, jid, url: doSendFn(filePath, url, jid, resultRequestUploadIqProtocolEntity.getIp(), caption)
       mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
-        result.getUrl(),
-        result.getResumeOffset(),
-        self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
+                                result.getUrl(),
+                                result.getResumeOffset(),
+                                successFn, self.onUploadError, self.onUploadProgress, async=False)
       mediaUploader.start()
     
   def onUploadSuccess(self, filePath, jid, url):
