@@ -165,7 +165,7 @@ class OngairLayer(YowInterfaceLayer):
     file = download(url)
 
     src = Image.open(file)
-    pictureData = src.resize((480, 480)).tobytes("jpeg", "RGB")
+    pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
     picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
     iq = SetPictureIqProtocolEntity(self.getOwnJid(), picturePreview, pictureData)
     self._sendIq(iq, self.onHandleSetProfilePicture, self.onHandleSetProfilePicture)
