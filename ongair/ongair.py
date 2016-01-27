@@ -174,7 +174,7 @@ class OngairLayer(YowInterfaceLayer):
   def sendImage(self, job):
     _session = self.session()
     asset = _session.query(Asset).get(job.args)
-    name = asset.get_image_file_name()
+    name = asset.name
     
     logger.info('about to download %s' %name)
     path = download(asset.url, name)

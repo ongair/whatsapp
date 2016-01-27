@@ -41,10 +41,11 @@ class Asset(Base):
   id = Column(Integer, primary_key=True)
   file_content_type = Column(String())
   file_file_name = Column(String())
+  name = Column(String())
   url = Column(String())
 
   def get_image_file_name(self):
-    name = self.file_file_name
+    name = self.name
     if self.file_content_type.encode('utf8').endswith('image/jpeg') or self.file_file_name.encode('utf8').endswith('.jpg'):
       name = "%s.jpg" %name
     elif self.file_content_type.encode('utf8').endswith('image/png') or self.file_file_name.encode('utf8').endswith('.png'):
