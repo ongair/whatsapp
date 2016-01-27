@@ -183,7 +183,7 @@ class OngairLayer(YowInterfaceLayer):
 
     jid = normalizeJid(job.targets)
     entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
-    successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, 'Hi')
+    successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, None)
     errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
 
     self._sendIq(entity, successFn, errorFn)    
@@ -207,7 +207,7 @@ class OngairLayer(YowInterfaceLayer):
       #   self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
       # mediaUploader.start()
 
-      successFn = lambda filePath, jid, url: doSendFn(filePath, url, jid, resultRequestUploadIqProtocolEntity.getIp(), caption)
+      successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, url, jid, resultRequestUploadIqProtocolEntity.getIp(), caption)
       mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
                                 result.getUrl(),
                                 result.getResumeOffset(),
