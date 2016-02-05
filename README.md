@@ -1,5 +1,6 @@
 # Setup #
-Installation
+
+Installing Dependencies
 
   ```
     sudo apt-get update
@@ -19,6 +20,18 @@ Installation
 
 ## Running ##
 
+
+On the base repo you will find a file ```.env.template``` and you will need to
+run this command to set up the .env
+
+```
+   cp .env.template .env
+```
+
+You will need then update the `.env` file .
+
+
+
   ```
     python ongair/run.py -h
     sudo env/bin/python ongair/starter.py -c .env -m 'check'
@@ -28,7 +41,7 @@ Installation
 
 
 
-# Contribution #
+# Contribution Guidelines #
 
 ## Developer guidelines
 
