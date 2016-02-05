@@ -4,8 +4,8 @@ from yowsup.layers.protocol_notifications.protocolentities import DeletePictureN
 from yowsup.layers.protocol_notifications.protocolentities import StatusNotificationProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities import OutgoingAckProtocolEntity
 
-class OngairYowNotificationsProtocolLayer(YowProtocolLayer):
 
+class OngairYowNotificationsProtocolLayer(YowProtocolLayer):
     def __init__(self):
         handleMap = {
             "notification": (self.recvNotification, self.sendNotification)
@@ -32,7 +32,7 @@ class OngairYowNotificationsProtocolLayer(YowProtocolLayer):
         elif node["type"] == "features":
             # Not implemented
             pass
-        elif node["type"] in [ "contacts", "subject", "w:gp2" ]:
+        elif node["type"] in ["contacts", "subject", "w:gp2"]:
             # Implemented in respectively the protocol_contacts and protocol_groups layer
             pass
         elif node["type"] == "contacts":
