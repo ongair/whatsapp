@@ -43,12 +43,14 @@ class OngairLayer(YowInterfaceLayer):
   def onFailure(self, entity):
     self.connected = False
     logger.info("Login Failed, reason: %s" %entity.getReason())
+    
+    # TODO: Where is the notification?
     if entity.getReason() == "not-authorized":
       _session = self.session()
       self.account.setup = False      
       _session.commit()
 
-    sys.exit(0)
+    sys.exit(0) #does not restart
 
   @ProtocolEntityCallback("message")
   def onMessage(self, messageProtocolEntity):    
@@ -74,6 +76,7 @@ class OngairLayer(YowInterfaceLayer):
     if job is not None:
       message = _session.query(Message).get(job.message_id)
       if message is not None:
+          # TODO: Make this uniform. Post the received to the API instead of updating the DB 
           message.received = True
           message.receipt_timestamp = datetime.now()          
           _session.commit()          
@@ -86,6 +89,7 @@ class OngairLayer(YowInterfaceLayer):
   def onIq(self, entity):
     logger.info('ProtocolEntityCallback. Count is %s' %self.pingCount)
     self.pingCount += 1
+    # Whenever we are pinged by whatsapp, poll the database for pending jobs
     self.work()
 
     if self.pingCount % 10 == 0:
@@ -243,6 +247,7 @@ class OngairLayer(YowInterfaceLayer):
     self.db = create_engine(url, echo=False, pool_size=1, pool_timeout=600,pool_recycle=600)
     self.session = sessionmaker(bind=self.db)
 
+  # Event handler for the layer
   def onEvent(self, event):
     if event.getName() == OngairLayer.EVENT_LOGIN:
       self.phone_number = self.getProp('ongair.account')
@@ -251,9 +256,15 @@ class OngairLayer(YowInterfaceLayer):
       logger.info('Disconnected. Will restart exit(2)')
       sys.exit(2)
 
+  # TODO: Name therapy
   def init(self):
+    # connect to the db
     self.init_db()
+
+    # initialize the realtime notifications lib
     self._initRealtime()
+
+    # load the account from the db
     self.get_account()
 
     if self.account.setup == True:

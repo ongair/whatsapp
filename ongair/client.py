@@ -31,14 +31,23 @@ class Client:
   def loop(self):
     if self.encrypted:
         stackBuilder = YowStackBuilder()
-        stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build()
+        # Create the default stack (a pile of layers) and add the Ongair Layer to the top of the stack
+        stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build() 
+        
+        # Set the phone number as a property that can be read by other layers
         stack.setProp('ongair.account', self.phone_number)    
         stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])    #whatsapp server address
         stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)              
         stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())          #info about us as WhatsApp client
+        
+        # Broadcast the login event. This gets handled by the OngairLayer
         stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))
+
+        # Run the asyncore loop
         stack.loop(timeout = 5, discrete = 0.5) #this is the program mainloop
     else:
+        # in the case that it is not encrypted
+        # TODO: Refactor this if necessary
         stackBuilder = OngairStackBuilder()
         stack = stackBuilder.pushDefaultLayers().push(OngairLayer).build()
 
