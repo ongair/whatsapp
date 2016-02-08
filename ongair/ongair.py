@@ -14,7 +14,7 @@ from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from util import get_env, post_to_server, download, normalizeJid
+from util import get_env, post_to_server, download, normalizeJid, cleanup_file
 from models import Account, Job, Message, Asset
 from datetime import datetime
 from pubnub import Pubnub
@@ -177,60 +177,105 @@ class OngairLayer(YowInterfaceLayer):
         self._sendIq(iq, self.onHandleSetProfilePicture, self.onHandleSetProfilePicture)
         job.sent = True
 
+    # This function sends an image to a contact
     def sendImage(self, job):
+        """ Send an image to a contact.
+
+        """
+
+        # create db session
         _session = self.session()
-        asset = _session.query(Asset).get(job.args)
-        name = asset.name
 
-        logger.info('about to download %s' % name)
-        path = download(asset.url, name)
+        # get the message
+        message = _session.query(Message).get(job.message_id)
+        caption = message.text
 
-        logger.info('Downloaded file to %s' % path)
+        logger.debug('Retrieved the message with caption %s of type %s' %(caption, message.message_type))
 
-        jid = normalizeJid(job.targets)
-        entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
-        successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity,
-                                                                                     originalEntity, None)
-        errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
+        asset = _session.query(Asset).get(message.asset_id)
+        if asset is not None:
+            url = asset.url
+            file_name = asset.name
 
-        self._sendIq(entity, successFn, errorFn)
-        job.sent = True
+            logger.debug('About to download %s from %s' %(file_name, url)) 
 
-    def doSendImage(self, filePath, url, to, ip=None, caption=None):
+            # download the file
+            path = download(url, file_name)
+            logger.debug('File downloaded to %s' %path)
+
+            # get whatsapp username from targets
+            target = normalizeJid(job.targets)
+
+            # create the upload request entity
+            entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
+
+            # the success callback
+            successFn = lambda successEntity, originalEntity: self.onRequestUploadSuccess(target, path, successEntity, originalEntity, caption)
+
+            # The on error callback 
+            errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
+
+            logger.info('About to sent the iq')
+            self._sendIq(entity, successFn, errorFn)
+
+            job.sent = True
+
+    # This function actually sends the image to the target via WhatsApp
+    def imageSend(self, filePath, url, to, ip=None, caption=None):
+        
+        # create the entity object to be passed down
         entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to, caption=caption)
+        logger.debug('Sending image %s to %s' %(url, to))
+
         self.toLower(entity)
 
-    # handlers
-    def onRequestUploadResult(self, jid, path, result, original, caption):
+    # This function is called when the request to upload an image is successful
+    def onRequestUploadSuccess(self, to, path, result, original, caption):
         if result.isDuplicate():
-            self.doSendImage(filePath, result.getUrl(), jid, result.getIp())
-        else:
-            # successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, jid, url, resultRequestUploadIqProtocolEntity.getIp())
-            # mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
-            #   result.getUrl(),
-            #   result.getResumeOffset(),
-            #   self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
-            # mediaUploader.start()
+            # This image is already on WhatsApp servers
 
-            successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, url, jid,
-                                                                        resultRequestUploadIqProtocolEntity.getIp(),
+            logger.info("The image %s is already on the WhatsApp server" %path)
+            self.imageSend(path, result.getUrl(), to, result.getIp(), caption)
+        else:
+            # We need to upload the image to WhatsApp servers
+
+            # The on success callback
+            successFn = lambda filePath, jid, url: self.onUploadSuccess(path, url, to,
+                                                                        result.getIp(),
                                                                         caption)
-            mediaUploader = MediaUploader(jid, self.getOwnJid(), path,
+
+            # create the actual uploader
+            mediaUploader = MediaUploader(to, self.getOwnJid(), path,
                                           result.getUrl(),
                                           result.getResumeOffset(),
-                                          successFn, self.onUploadError, self.onUploadProgress, async=False)
+                                          successFn, 
+                                          self.onUploadError, #upload error
+                                          self.onUploadProgress, #upload progress
+                                          async=False)
+            # begin the upload
             mediaUploader.start()
 
-    def onUploadSuccess(self, filePath, jid, url):
-        self.doSendImage(filePath, url, jid)
+    # This function is called when the image upload to WhatsApp servers was successful
+    def onUploadSuccess(self, filePath, url, to, ip, caption):
 
+        # call the actual image send
+        self.imageSend(filePath, url, to, ip, caption)
+
+    # This function is called when there is an upload error
     def onUploadError(self, filePath, jid, url):
+
+        #TODO: add the job id so we can track errors and retry
         logger.info("Upload file %s to %s for %s failed!" % (filePath, url, jid))
 
+    # This function is called by the uploader to report progress - not essential
     def onUploadProgress(self, filePath, jid, url, progress):
+        logger.debug("Uploading file %s progress is %s" %(url, progress))
         return None
 
+    # This function is called when there is an error with requesting an upload
     def onRequestUploadError(self, jid, path, result, original):
+
+        #TODO: add the job id so we can track errors and retry
         logger.info('Error with uploading image %s' % path)
 
     def onHandleSetProfilePicture(self, result, original):
