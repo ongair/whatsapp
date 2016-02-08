@@ -38,6 +38,9 @@ class Message(Base):
     receipt_timestamp = Column(DateTime())
     received = Column(Boolean())
     account_id = Column(Integer())
+    text = Column(String())
+    message_type = Column(String())
+    asset_id = Column(Integer())
 
 
 class Asset(Base):
