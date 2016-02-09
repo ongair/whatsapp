@@ -36,8 +36,11 @@ class OngairLayer(YowInterfaceLayer):
 
         entity = AvailablePresenceProtocolEntity()
         self.toLower(entity)
+
         self.work()
         self.pingCount = 0
+
+
 
     @ProtocolEntityCallback("failure")
     def onFailure(self, entity):
@@ -166,16 +169,36 @@ class OngairLayer(YowInterfaceLayer):
         self._sendIq(entity, self.onHandleSetProfileStatus, self.onHandleSetProfileStatus)
         job.sent = True
 
+    # This function sets the profile picture
     def setProfilePicture(self, job):
-        url = job.args
-        file = download(url)
 
-        src = Image.open(file)
+        # success call back for setting profile picture
+        def onProfilePictureSuccess(resultIqEntity, originalIqEntity):
+            logger.info("Profile picture was successfully set")
+
+        # error call back for setting profile picture
+        def onProfilePictureError(errorIqEntity, originalIqEntity):
+            logger.error("Error setting the profile picture")
+
+        # downlaod the file
+        url = job.args
+        path = download(url)
+
+        # load the image
+        src = Image.open(path)        
+        
+        # get two versions. 640 and 96
         pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
         picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
-        iq = SetPictureIqProtocolEntity(self.getOwnJid(), picturePreview, pictureData)
-        self._sendIq(iq, self.onHandleSetProfilePicture, self.onHandleSetProfilePicture)
+
+        # TODO: For some reason getOwnJid is not appending the domain and this needs to work for setting profile picture
+        iq = SetPictureIqProtocolEntity("%s@s.whatsapp.net" %self.getOwnJid(), picturePreview, pictureData)
+
+        # send the id
+        self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
+
         job.sent = True
+
 
     # This function sends an image to a contact
     def sendImage(self, job):
