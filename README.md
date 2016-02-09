@@ -31,13 +31,17 @@ run this command to set up the .env
 You will need then update the `.env` file .
 
 
-
+### To be deprecated ###
   ```
     python ongair/run.py -h
     sudo env/bin/python ongair/starter.py -c .env -m 'check'
     sudo env/bin/python ongair/starter.py -c .env -m 'start'
   ```
 
+### Current ###
+  ```
+    ongair-cli -c .env -a <phone-number>
+  ```
 
 
 
