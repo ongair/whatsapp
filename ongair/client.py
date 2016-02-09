@@ -20,7 +20,7 @@ from stack import OngairStackBuilder
 
 
 class Client:
-    def __init__(self, phone_number, encrypted=False):
+    def __init__(self, phone_number, encrypted=True):
         self.connected = False
         self.encrypted = encrypted
         self.phone_number = phone_number
