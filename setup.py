@@ -2,7 +2,20 @@
 from __future__ import print_function
 from setuptools import setup, find_packages
 import ongair
+import pkutils
 
-dependencies = ['click', 'docopt', 'mandrill', 'MySQL-python', 'ordereddict', 'Pillow',
-                'protobuf', 'pycrypto', 'pubnub', 'python-axolotl', 'python-axolotl-curve25519',
-                'python-dateutil','python-dotenv', 'requests','six','SQLAlchemy', 'wheel','yowsup2']
+requirements = list(pkutils.parse_requirments('requirements.txt'))
+
+setup(
+    name = '',
+    version = '',
+    url = '',
+    licence = '',
+    author = '',
+    install_requires = ,
+    scripts = ['ongair=cli'],
+    author_email = '',
+    description = '',
+
+
+)
