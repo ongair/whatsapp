@@ -30,7 +30,7 @@ setup(
     include_package_data = True,
     platforms = ['MacOS X', 'Windows', 'Linux'],
     classifiers = [
-        pkutils.LICENCES[license],
+        pkutils.LICENSES[license],
         pkutils.get_status(version),
         'Natural Language :: English',
         'Programming Language :: Python',
