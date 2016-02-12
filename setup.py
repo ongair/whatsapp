@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from setuptools import setup, find_packages
-import ongair
+from setuptools import find_packages
 import pkutils
+import ongair
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 requirements = list(pkutils.parse_requirements('requirements.txt'))
 readme = pkutils.read('README.md')
