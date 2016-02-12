@@ -14,22 +14,22 @@ description = ongair.__description__
 email = ongair.__email__
 user = 'ongair'
 
-#TODO: Figuring out the right licence,
+# TODO: Figuring out the right licence,
 setup(
-    name = project,
-    version = version,
-    url = pkutils.get_url(project, user),
-    licence = license,
-    author = author,
-    install_requires = requirements,
-    setup_requires = ['pkutils>=0.12.4,<0.13.0'],
-    scripts = ['ongair=cli'],
-    author_email = email,
-    description = description,
-    packages = find_packages(),
-    include_package_data = True,
-    platforms = ['MacOS X', 'Windows', 'Linux'],
-    classifiers = [
+    name=project,
+    version=version,
+    url=pkutils.get_url(project, user),
+    licence=license,
+    author=author,
+    install_requires=requirements,
+    setup_requires=['pkutils>=0.12.4,<0.13.0'],
+    scripts=['ongair-cli'],
+    author_email=email,
+    description=description,
+    packages=find_packages(),
+    include_package_data=True,
+    platforms=['MacOS X', 'Windows', 'Linux'],
+    classifiers=[
         pkutils.LICENSES[license],
         pkutils.get_status(version),
         'Natural Language :: English',
@@ -44,6 +44,5 @@ setup(
         'Operating System :: Microsoft :: Windows',
 
     ]
-
 
 )
