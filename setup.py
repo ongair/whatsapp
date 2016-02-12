@@ -7,10 +7,10 @@ import pkutils
 requirements = list(pkutils.parse_requirements('requirements.txt'))
 readme = pkutils.read('README.md')
 author = ongair.__author__
-license = ongair.__licence__
+license = ongair.__license__
 version = ongair.__version__
 project = ongair.__title__
-description = ongair.__decription__
+description = ongair.__description__
 email = ongair.__email__
 user = 'ongair'
 
