@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 import ongair
 import pkutils
 
-requirements = list(pkutils.parse_requirments('requirements.txt'))
+requirements = list(pkutils.parse_requirements('requirements.txt'))
 readme = pkutils.read('README.md')
 author = ongair.__author__
 license = ongair.__licence__
