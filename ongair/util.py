@@ -79,3 +79,7 @@ def normalizeJid(number):
         return "%s@g.us" % number
 
     return "%s@s.whatsapp.net" % number
+
+# Removes the @s.whatsapp.net from a jid
+def strip_jid(jid):
+    return jid.split('@')[0]
