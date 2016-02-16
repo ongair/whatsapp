@@ -14,7 +14,7 @@ from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from util import get_env, post_to_server, download, normalizeJid, cleanup_file
+from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid
 from models import Account, Job, Message, Asset
 from datetime import datetime
 from pubnub import Pubnub
@@ -66,8 +66,15 @@ class OngairLayer(YowInterfaceLayer):
             elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video":
                 self.onMediaMessage(messageProtocolEntity)
 
+    # This function is called when a receipt is received back from a contact
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
+        """
+            When a receipt is received from WhatsApp. First it is acknowledged then
+            depening on the type of receipt the right delivery status is made.
+        """
+
+        # Acknowledge the receipt
         ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", entity.getType(), entity.getFrom())
         self.toLower(ack)
 
@@ -75,19 +82,25 @@ class OngairLayer(YowInterfaceLayer):
         receipt_type = entity.getType()
 
         _session = self.session()
-        job = _session.query(Job).filter_by(account_id=self.account.id, whatsapp_message_id=id,
-                                            method='sendMessage').scalar()
+        job = _session.query(Job).filter_by(account_id=self.account.id, whatsapp_message_id=id).scalar()
         if job is not None:
-            message = _session.query(Message).get(job.message_id)
-            if message is not None:
-                # TODO: Make this uniform. Post the received to the API instead of updating the DB
-                message.received = True
-                message.receipt_timestamp = datetime.now()
-                _session.commit()
+            if job.method == 'sendMessage':
+                # In the event that this is from a text message
+                message = _session.query(Message).get(job.message_id)
+                if message is not None:
+                    # TODO: Make this uniform. Post the received to the API instead of updating the DB
+                    message.received = True
+                    message.receipt_timestamp = datetime.now()
+                    _session.commit()
 
-                if receipt_type == 'read':
-                    data = {'receipt': {'type': 'read', 'message_id': message.id}}
-                    post_to_server('receipt', self.phone_number, data)
+                    if receipt_type == 'read':
+                        data = {'receipt': {'type': 'read', 'message_id': message.id}}
+                        post_to_server('receipt', self.phone_number, data)
+            elif job.method == 'broadcast_Text':
+                contact = entity.getParticipant()
+                data = { 'receipt': { 'message_id': id, 'phone_number' : strip_jid(contact) }}
+
+                post_to_server('broadcast_receipt', self.phone_number, data)
 
     @ProtocolEntityCallback("iq")
     def onIq(self, entity):
@@ -132,7 +145,7 @@ class OngairLayer(YowInterfaceLayer):
     def work(self):
         _session = self.session()
         jobs = _session.query(Job).filter_by(sent=False, account_id=self.account.id, pending=False).all()
-        logger.info("Number of jobs ready to run %s" % len(jobs))
+        logger.info("Number of jobs ready to run %s for account id %s" % (len(jobs), self.account.id))
 
         for job in jobs:
             logger.info('Job %s with args %s and targets %s' % (job.method, job.args, job.targets))
