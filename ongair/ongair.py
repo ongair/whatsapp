@@ -2,7 +2,7 @@ from yowsup.layers.protocol_presence.protocolentities.presence_available import 
 from yowsup.layers.auth import YowAuthenticationProtocolLayer
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.network import YowNetworkLayer
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity, BroadcastTextMessage
 from yowsup.layers.protocol_contacts.protocolentities import GetSyncIqProtocolEntity, ResultSyncIqProtocolEntity
 from yowsup.layers.protocol_receipts.protocolentities import OutgoingReceiptProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities import OutgoingAckProtocolEntity
@@ -146,8 +146,25 @@ class OngairLayer(YowInterfaceLayer):
                 self.setProfilePicture(job)
             elif job.method == 'sendImage':
                 self.sendImage(job)
+            elif job.method == 'broadcast_Text':
+                self.broadcast(job)
 
         _session.commit()
+
+    # This function send a broadcast to a list of contacts
+    def broadcast(self, job):
+        """ This method reads the message and targets arguments in the job
+            and sends a broadcast
+        """
+
+        targets = [ normalizeJid(number) for number in job.targets.split(',') ]
+        outgoingMessage = BroadcastTextMessage(targets, job.args)
+        job.whatsapp_message_id = outgoingMessage.getId()
+        self.toLower(outgoingMessage)
+
+        job.runs += 1 
+        job.sent = True
+
 
     def sync(self, job):
         contacts = job.targets.split(',')
