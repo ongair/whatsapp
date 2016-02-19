@@ -7,11 +7,8 @@ from ongair.client import Client
 
 def main(argv):
   parser = argparse.ArgumentParser(description='Description of your program')
-  parser.add_argument('-c', '--config', help='Path of the config file', required=True)
   parser.add_argument('-a', '--account', help='Account to start', required=True)
   args = vars(parser.parse_args())
-
-  load_dotenv(args['config'])
 
   client = Client(args['account'])
   client.loop()
