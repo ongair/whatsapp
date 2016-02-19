@@ -31,20 +31,6 @@ easy_install ongair-whatsapp
 
 ## Project Structure
 
-```
-|-- CONTRIBUTING.md
-|-- LICENCE
-|-- MANIFEST.in
-|-- README.md
-|-- dist
-|   |--ongair-whatsapp-1.0.0.tar.gz
-|-- logs
-|-- ongair
-|   |-- __init__.py
-|   |-- check.py
-
-```
-
 ``` bash
 ├── CONTRIBUTING.md
 ├── LICENCE
