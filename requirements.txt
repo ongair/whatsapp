@@ -12,7 +12,6 @@ pycrypto==2.6.1
 python-axolotl==0.1.7
 python-axolotl-curve25519==0.1
 python-dateutil==2.4.2
-python-dotenv==0.1.5
 requests==2.8.1
 semver==2.3.1
 six==1.10.0
