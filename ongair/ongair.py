@@ -65,6 +65,8 @@ class OngairLayer(YowInterfaceLayer):
                 self.onTextMessage(messageProtocolEntity)
             elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video":
                 self.onMediaMessage(messageProtocolEntity)
+            elif messageProtocolEntity.getMediaType() == "location":
+                self.onLocationMessage(messageProtocolEntity)
 
     # This function is called when a receipt is received back from a contact
     @ProtocolEntityCallback("receipt")
@@ -112,6 +114,19 @@ class OngairLayer(YowInterfaceLayer):
         if self.pingCount % 10 == 0:
             logger.info('Send online signal to app.ongair.im')
             self._post('status', {'status': '1', 'message': 'Connected'})
+
+    # This is called when a location message is received
+    def onLocationMessage(self, entity):
+        """
+            When a location message is received get the latitude and longitude
+            and post to ongair
+        """
+        by = entity.getFrom(False)
+        id = entity.getId()
+        name = entity.getNotify()
+
+        data = { 'location' : { 'latitude' : entity.getLatitude(), 'longitude' : entity.getLongitude(), 'external_contact_id' : by, 'external_message_id' : id, 'name' : name, 'source': 'WhatsApp' }}
+        self._post('locations', data)
 
     def onMediaMessage(self, entity):
         by = entity.getFrom(False)
