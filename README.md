@@ -1,106 +1,85 @@
-# Setup #
+# ongair-whatsapp
 
-Installing Dependencies
+## Introduction
 
-  ```
-    sudo apt-get update
-    sudo apt-get install python-pip
-    
-    sudo apt-get install libmysqlclient-dev python-dev #python-dev only for ubuntu
-    # for ubuntu
-    sudo apt-get install libjpeg8 libjpeg62-dev libfreetype6 libfreetype6-dev
-    
-    sudo pip install virtualenv
-    virtualenv env
-
-    source env/bin/activate
-    
-    pip install -r requirements.txt
-  ```
-
-## Running ##
+ongair-whatsapp is python package that was built on top of Yoswsup to support Ongair's platform. ongair-whatsapp is 
+on top of yowsup layers.
 
 
-On the base repo you will find a file ```.env.template``` and you will need to
-run this command to set up the .env
+## Requirements
+
+ongair-whatsapp has been tested and known to work on Python27 ; PyPi 4.0
+
+
+## Installation
+
+I bet you are using [virtualenv](http://www.virtualenv.org/en/latest/index.html) ,right?
+
+
+
+At the command line , install ongair-whatsapp using either *pip* (recommended)
 
 ```
-   cp .env.template .env
+pip install ongair-whatsapp
 ```
 
-You will need then update the `.env` file .
-
-
-### To be deprecated ###
-  ```
-    python ongair/run.py -h
-    sudo env/bin/python ongair/starter.py -c .env -m 'check'
-    sudo env/bin/python ongair/starter.py -c .env -m 'start'
-  ```
-
-### Current ###
-  ```
-    ongair-cli -c .env -a <phone-number>
-  ```
-
-
-
-# Contribution Guidelines #
-
-## Developer guidelines
-
-The development process of this project follows the gitflow concept
-
-* master - production
-* develop - staging
-* feature branches - this will be for any feature you are working
-* releases
-
-
-## Git Flow Setup
-
-### Installation
-
-#### Linux
+or *easy_install*
 
 ```
-$ apt-get install git-flow
+easy_install ongair-whatsapp
 ```
 
-#### Mac
+## Project Structure
 
+``` bash
+├── CONTRIBUTING.md
+├── LICENCE
+├── MANIFEST.in
+├── README.md
+├── dist
+│   └── ongair-whatsapp-1.0.0.tar.gz
+├── logs
+├── ongair
+│   ├── __init__.py
+│   ├── check.py
+│   ├── client.py
+│   ├── models.py
+│   ├── notification.py
+│   ├── ongair-example.conf
+│   ├── ongair.py
+│   ├── readme.md
+│   ├── reset.py
+│   ├── run.py
+│   ├── stack.py
+│   ├── starter.py
+│   ├── util.py
+├── ongair-cli
+├── ongair_whatsapp.egg-info
+│   ├── PKG-INFO
+│   ├── SOURCES.txt
+│   ├── dependency_links.txt
+│   ├── requires.txt
+│   └── top_level.txt
+├── requirements.txt
+├── setup.cfg
+├── setup.py
+└── tmp
 ```
-$ brew install git-flow
-```
-
-### Getting Started
-
-1. Initialize your repository with
-
-```
-$ git flow init
-```
-
-2. Start a new feature
-
-```
-$ git flow feature start MYFEATURE
-```
-
-3. Work on the feature and then send a PR and tag either of the developers.
 
 
-4. Merges will be done on the github side rather than the terminal to minimize conflicts.
 
+## Scripts
 
-For more into on git-flow you can read this 2 articles
+ongair-whatsapp comes with a launch script ``` ongair-cli ```
 
-[ Git Flow CheeatSheet](http://danielkummer.github.io/git-flow-cheatsheet/) . Thanks to Daniel Crammer
-[ A successful Git Branching Model](http://nvie.com/posts/a-successful-git-branching-model/) . Thanks to Vincent Driessen
+## Setup
+ 
+```pip install -r requirements.txt```
 
-### Notes
+## Credits
 
-* Feature branches automatically branch out of the main develop branch
-* Commiting to develop branch directly or the master branch shall not be acceptable
-* All work shall be done on it own branch and after done a pull request to be submitted for review.
-* You cannot merge your branch to develop, the other developer or technical lead are the only who can merge.
+Shoutouts to Yowsup for inspriting ongair-whatsapp
+
+## Licence
+
+ongair-whatsapp is distributed under the GPL V3 Licence
