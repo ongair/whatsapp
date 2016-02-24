@@ -2,13 +2,13 @@ import os, logging, json, requests, posixpath, urlparse, urllib
 
 logger = logging.getLogger(__name__)
 
+
 # Get an environment variable
 def get_env(key, raiseError=True):
-
     value = os.environ.get(key)
     if value is None:
         if raiseError:
-            raise Exception("Error. Set the environment variable %s in your .env file" %key)
+            raise Exception("Error. Environment Variables not loaded, kindly load them " % key)
         else:
             return ""
     else:
@@ -20,20 +20,21 @@ def get_filename(url):
     path = urlparse.urlsplit(url).path
     return posixpath.basename(path)
 
+
 # This function downloads a file to the temporary folder and returns the path
 def download(url, name=None):
-    
     # If no name is provided use the last part of the url
     if name is None:
         filename = get_filename(url)
     else:
         filename = name
-    
+
     logger.info("About to download %s to tmp/%s" % (url, filename))
     urllib.urlretrieve(url, "tmp/%s" % filename)
-    
+
     # return the path of the file
     return "tmp/%s" % filename
+
 
 # This function removes a file from tmp
 def cleanup_file(path):
@@ -79,6 +80,7 @@ def normalizeJid(number):
         return "%s@g.us" % number
 
     return "%s@s.whatsapp.net" % number
+
 
 # Removes the @s.whatsapp.net from a jid
 def strip_jid(jid):
