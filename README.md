@@ -41,15 +41,11 @@ easy_install ongair-whatsapp
 ├── logs
 ├── ongair
 │   ├── __init__.py
-│   ├── check.py
 │   ├── client.py
 │   ├── models.py
 │   ├── notification.py
 │   ├── ongair-example.conf
 │   ├── ongair.py
-│   ├── readme.md
-│   ├── reset.py
-│   ├── run.py
 │   ├── stack.py
 │   ├── starter.py
 │   ├── util.py
