@@ -63,7 +63,7 @@ class OngairLayer(YowInterfaceLayer):
         if not messageProtocolEntity.isGroupMessage():
             if messageProtocolEntity.getType() == 'text':
                 self.onTextMessage(messageProtocolEntity)
-            elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video":
+            elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video" or messageProtocolEntity.getMediaType() == "audio" :
                 self.onMediaMessage(messageProtocolEntity)
             elif messageProtocolEntity.getMediaType() == "location":
                 self.onLocationMessage(messageProtocolEntity)
@@ -128,6 +128,7 @@ class OngairLayer(YowInterfaceLayer):
         data = { 'location' : { 'latitude' : entity.getLatitude(), 'longitude' : entity.getLongitude(), 'external_contact_id' : by, 'external_message_id' : id, 'name' : name, 'source': 'WhatsApp' }}
         self._post('locations', data)
 
+    # This is called by onMessage when a media type is received
     def onMediaMessage(self, entity):
         by = entity.getFrom(False)
         id = entity.getId()
