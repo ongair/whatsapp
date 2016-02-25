@@ -63,7 +63,7 @@ class OngairLayer(YowInterfaceLayer):
         if not messageProtocolEntity.isGroupMessage():
             if messageProtocolEntity.getType() == 'text':
                 self.onTextMessage(messageProtocolEntity)
-            elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video":
+            elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video" or messageProtocolEntity.getMediaType() == "audio" :
                 self.onMediaMessage(messageProtocolEntity)
             elif messageProtocolEntity.getMediaType() == "location":
                 self.onLocationMessage(messageProtocolEntity)
