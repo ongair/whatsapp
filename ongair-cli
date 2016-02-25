@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import sys, getopt, os, argparse
-from dotenv import load_dotenv
 from ongair.util import get_env
 from ongair.client import Client
 
-def main(argv):
-  parser = argparse.ArgumentParser(description='Description of your program')
-  parser.add_argument('-a', '--account', help='Account to start', required=True)
-  args = vars(parser.parse_args())
 
-  client = Client(args['account'])
-  client.loop()
+def main(argv):
+    parser = argparse.ArgumentParser(description='Description of your program')
+    parser.add_argument('-a', '--account', help='Account to start', required=True)
+    args = vars(parser.parse_args())
+
+    client = Client(args['account'])
+    client.loop()
+
 
 if __name__ == "__main__":
-  main(sys.argv[1:])
+    main(sys.argv[1:])
