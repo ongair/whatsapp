@@ -128,6 +128,13 @@ class OngairLayer(YowInterfaceLayer):
         data = { 'location' : { 'latitude' : entity.getLatitude(), 'longitude' : entity.getLongitude(), 'external_contact_id' : by, 'external_message_id' : id, 'name' : name, 'source': 'WhatsApp' }}
         self._post('locations', data)
 
+        self._sendRealtime({
+            'type': 'location',
+            'external_contact_id': by,
+            'latitude': entity.getLatitude(),
+            'longitude': entity.getLongitude() 
+        })
+
     # This is called by onMessage when a media type is received
     def onMediaMessage(self, entity):
         by = entity.getFrom(False)
