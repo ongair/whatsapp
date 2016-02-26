@@ -131,6 +131,7 @@ class OngairLayer(YowInterfaceLayer):
         self._sendRealtime({
             'type': 'location',
             'external_contact_id': by,
+            'name': name,
             'latitude': entity.getLatitude(),
             'longitude': entity.getLongitude() 
         })
@@ -145,6 +146,14 @@ class OngairLayer(YowInterfaceLayer):
         data = {'message': {'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
                             'whatsapp_message_id': id, 'name': name, 'caption': entity.getCaption()}}
         self._post('upload', data)
+
+        self._sendRealtime({
+            'type': entity.getMediaType(),
+            'external_contact_id': by,
+            'url': entity.url,
+            'caption': entity.getCaption(),
+            'name': name            
+        })
 
     def onTextMessage(self, entity):
         text = entity.getBody()
