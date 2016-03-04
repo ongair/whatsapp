@@ -142,16 +142,21 @@ class OngairLayer(YowInterfaceLayer):
         id = entity.getId()
         name = entity.getNotify()
         preview = None
+        caption = ""
+
+        # Audio clips do not have captions
+        if entity.getMediaType().capitalize() != "Audio":
+            caption = entity.getCaption()
 
         data = {'message': {'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
-                            'whatsapp_message_id': id, 'name': name, 'caption': entity.getCaption()}}
+                            'whatsapp_message_id': id, 'name': name, 'caption': caption }}
         self._post('upload', data)
 
         self._sendRealtime({
             'type': entity.getMediaType(),
             'external_contact_id': by,
             'url': entity.url,
-            'caption': entity.getCaption(),
+            'caption': caption,
             'name': name            
         })
 
