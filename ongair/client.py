@@ -8,6 +8,7 @@ from yowsup.layers.protocol_acks import YowAckProtocolLayer
 from yowsup.layers.network import YowNetworkLayer
 from yowsup.layers.coder import YowCoderLayer
 from yowsup.layers.protocol_media import YowMediaProtocolLayer
+from yowsup.layers.protocol_iq import YowIqProtocolLayer
 from yowsup.stacks import YowStack
 from yowsup.stacks import YowStackBuilder
 from yowsup.common import YowConstants
@@ -33,7 +34,10 @@ class Client:
             # Create the default stack (a pile of layers) and add the Ongair Layer to the top of the stack
             stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build()
 
+            ping_interval = get_env('ping_interval')
+
             # Set the phone number as a property that can be read by other layers
+            stack.setProp(YowIqProtocolLayer.PROP_PING_INTERVAL, ping_interval)
             stack.setProp('ongair.account', self.phone_number)
             stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])  # whatsapp server address
             stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
