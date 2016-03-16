@@ -34,7 +34,7 @@ class Client:
             # Create the default stack (a pile of layers) and add the Ongair Layer to the top of the stack
             stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build()
 
-            ping_interval = get_env('ping_interval')
+            ping_interval = int(get_env('ping_interval'))
 
             # Set the phone number as a property that can be read by other layers
             stack.setProp(YowIqProtocolLayer.PROP_PING_INTERVAL, ping_interval)
