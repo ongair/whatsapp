@@ -69,7 +69,7 @@ target/
 ##Project Specific .gitignore
 .env
 .env.prod
-env.sh
+env*.sh
 .enc.enc
 .cc
 *.pyc
