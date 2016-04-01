@@ -17,15 +17,13 @@ from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup.env import YowsupEnv
 from ongair import OngairLayer
-from stack import OngairStackBuilder
 import sys
 import rollbar
 
 
 class Client:
-    def __init__(self, phone_number, encrypted=True):
+    def __init__(self, phone_number):
         self.connected = False
-        self.encrypted = encrypted
         self.phone_number = phone_number
 
         setup_logging(phone_number)
