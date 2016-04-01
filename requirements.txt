@@ -17,4 +17,4 @@ semver==2.3.1
 six==1.10.0
 SQLAlchemy==1.0.9
 wheel==0.24.0
-ongair-yowsup2==2.4.49
+yowsup2==2.4.102
