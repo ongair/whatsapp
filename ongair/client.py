@@ -18,6 +18,8 @@ from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup.env import YowsupEnv
 from ongair import OngairLayer
 from stack import OngairStackBuilder
+import sys
+import rollbar
 
 
 class Client:
@@ -27,6 +29,12 @@ class Client:
         self.phone_number = phone_number
 
         setup_logging(phone_number)
+
+        environment = get_env('env')
+        rollbar_key = get_env('rollbar_key')
+
+        # initialize rollbar for exception reporting
+        rollbar.init(rollbar_key, environment)
 
     def loop(self):
         stackBuilder = YowStackBuilder()
@@ -45,7 +53,13 @@ class Client:
         YowsupEnv.setEnv('s40')
 
         # Broadcast the login event. This gets handled by the OngairLayer
-        stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))
+        stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))        
 
-        # Run the asyncore loop
-        stack.loop(timeout=5, discrete=0.5)  # this is the program mainloop
+        try:
+            # Run the asyncore loop
+            stack.loop(timeout=5, discrete=0.5)  # this is the program mainloop
+        except AttributeError:
+            # for now this is a proxy for ProtocolException i.e. where yowsup has tried to read an 
+            # attribute that does not exist
+            rollbar.report_exc_info()
+            sys.exit(2)
