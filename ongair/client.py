@@ -31,10 +31,15 @@ class Client:
         environment = get_env('env')
         rollbar_key = get_env('rollbar_key')
 
+        self.yowsup_env = get_env('yowsup_env', False, 's40')
+
         # initialize rollbar for exception reporting
         rollbar.init(rollbar_key, environment)
 
     def loop(self):
+        # set the yowsup environment
+        YowsupEnv.setEnv(self.yowsup_env)
+
         stackBuilder = YowStackBuilder()
         # Create the default stack (a pile of layers) and add the Ongair Layer to the top of the stack
         stack = stackBuilder.pushDefaultLayers(True).push(OngairLayer).build()
@@ -46,9 +51,6 @@ class Client:
         stack.setProp('ongair.account', self.phone_number)
         stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])  # whatsapp server address
         stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
-        
-        # YowsupEnv.setEnv('android')
-        YowsupEnv.setEnv('s40')
 
         # Broadcast the login event. This gets handled by the OngairLayer
         stack.broadcastEvent(YowLayerEvent(OngairLayer.EVENT_LOGIN))        
