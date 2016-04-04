@@ -11,6 +11,7 @@ from yowsup.layers.protocol_profiles.protocolentities import SetPictureIqProtoco
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
+from yowsup.layers.protocol_groups.protocolentities import LeaveGroupsIqProtocolEntity
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -198,8 +199,17 @@ class OngairLayer(YowInterfaceLayer):
                 self.sendImage(job)
             elif job.method == 'broadcast_Text':
                 self.broadcast(job)
+            elif job.method == 'leaveGroup':
+                self.leaveGroup(job)
 
         _session.commit()
+
+    def leaveGroup(self, job):        
+        entity = LeaveGroupsIqProtocolEntity([ normalizeJid(job.args) ])
+        self.toLower(entity)
+
+        job.sent = True
+        job.runs += 1
 
     # This function send a broadcast to a list of contacts
     def broadcast(self, job):

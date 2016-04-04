@@ -4,13 +4,13 @@ logger = logging.getLogger(__name__)
 
 
 # Get an environment variable
-def get_env(key, raiseError=True):
+def get_env(key, raiseError=True, default_value=None):
     value = os.environ.get(key)
     if value is None:
         if raiseError:
             raise Exception("Error. Environment Variables not loaded, kindly load them " % key)
         else:
-            return ""
+            return default_value
     else:
         return value.encode('utf-8')
 
