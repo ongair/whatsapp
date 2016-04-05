@@ -15,11 +15,11 @@ from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
 from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
-from yowsup.env import YowsupEnv
+# from yowsup.env import YowsupEnv
 from ongair import OngairLayer
 import sys
 import rollbar
-
+import logging
 
 class Client:
     def __init__(self, phone_number):
@@ -27,6 +27,8 @@ class Client:
         self.phone_number = phone_number
 
         setup_logging(phone_number)
+
+        self.logger = logging.getLogger(__name__)
 
         environment = get_env('env')
         rollbar_key = get_env('rollbar_key')
@@ -37,8 +39,8 @@ class Client:
         rollbar.init(rollbar_key, environment)
 
     def loop(self):
-        # set the yowsup environment
-        YowsupEnv.setEnv(self.yowsup_env)
+        # set the yowsup environment - not supported in fork
+        # YowsupEnv.setEnv(self.yowsup_env)
 
         stackBuilder = YowStackBuilder()
         # Create the default stack (a pile of layers) and add the Ongair Layer to the top of the stack
@@ -61,5 +63,11 @@ class Client:
         except AttributeError:
             # for now this is a proxy for ProtocolException i.e. where yowsup has tried to read an 
             # attribute that does not exist
+            self.logger.exception("Attribute error")
+            rollbar.report_exc_info()
+            sys.exit(2)
+        except AssertionError:
+            # this is a proxy for a wrong expected attribute 
+            self.logger.exception("Assertion error")
             rollbar.report_exc_info()
             sys.exit(2)
