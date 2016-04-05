@@ -23,6 +23,7 @@ python-axolotl==0.1.34
 python-axolotl-curve25519==0.1
 python-dateutil==2.5.2
 python-dotenv==0.1.5
+pyuploadcare==2.0
 requests==2.8.1
 rollbar==0.11.6
 semver==2.3.1
