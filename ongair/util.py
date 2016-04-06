@@ -64,6 +64,15 @@ def post_to_server(url, phone_number, payload):
     except:
         logger.info('Error with reaching the url %s' % url)
 
+# Sends a notification to slack
+def notify_slack(message, channel="#activation", username="webhookbot"):
+    url = "https://ongair.slack.com/services/hooks/incoming-webhook?token=%s" % get_env('slack_token')
+    try:
+        data = json.dumps({ 'channel': channel, 'username': username, 'icon_emoji' : ':ghost:', 'text' : message })
+        requests.post(url, data=data)
+    except:
+        logger.exception("Error posting to slack")
+        rollbar.report_exc_info()
 
 def send_sms(to, message):
     try:
