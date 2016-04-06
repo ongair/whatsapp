@@ -12,7 +12,7 @@ It is builts on top of the yowsup layer
 
 """
 
-__version__ = "1.0.11"
+__version__ = "1.0.12"
 
 __title__ = 'ongair-whatsapp'
 __package_name__ = 'ongair-whatsapp'
