@@ -75,3 +75,8 @@ class Client:
             self.logger.exception("Assertion error")
             rollbar.report_exc_info()
             sys.exit(2)
+        except:
+            self.logger.exception("Unknown error")
+            rollbar.report_exc_info()
+            # do not restart as we are not sure what the problem is
+            sys.exit(0)
