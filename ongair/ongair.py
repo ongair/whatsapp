@@ -21,7 +21,8 @@ from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
 
-import logging, requests, json, sys
+import logging, requests, json, sys, tempfile
+import pyuploadcare
 
 logger = logging.getLogger(__name__)
 
@@ -144,19 +145,39 @@ class OngairLayer(YowInterfaceLayer):
         name = entity.getNotify()
         preview = None
         caption = ""
+        encrypted = entity.isEncrypted
+        url = None
 
         # Audio clips do not have captions
         if entity.getMediaType().capitalize() != "Audio":
             caption = entity.getCaption()
 
-        data = {'message': {'url': entity.url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
+
+        if encrypted:
+            # decrypt the media            
+            filename = "%s/%s%s"%(tempfile.gettempdir(),entity.getId(),entity.getExtension())            
+            logger.info("Media file name %s" %filename)
+
+            with open(filename, 'wb') as file:
+                file.write(entity.getMediaContent())
+
+            file = open(filename, 'r')
+            response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
+            uploaded_file = pyuploadcare.File(response['file'])
+            uploaded_file.store()
+            info = uploaded_file.info()
+            url = info['original_file_url']
+        else:
+            url = entity.url
+        
+        data = {'message': {'url': url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
                             'whatsapp_message_id': id, 'name': name, 'caption': caption }}
         self._post('upload', data)
 
         self._sendRealtime({
             'type': entity.getMediaType(),
             'external_contact_id': by,
-            'url': entity.url,
+            'url': url,
             'caption': caption,
             'name': name            
         })
