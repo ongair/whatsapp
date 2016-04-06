@@ -15,7 +15,7 @@ from yowsup.layers.protocol_groups.protocolentities import LeaveGroupsIqProtocol
 from yowsup.layers import YowLayerEvent
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid
+from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid, notify_slack
 from models import Account, Job, Message, Asset
 from datetime import datetime
 from pubnub import Pubnub
@@ -47,12 +47,15 @@ class OngairLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("failure")
     def onFailure(self, entity):
         self.connected = False
-        logger.info("Login Failed, reason: %s" % entity.getReason())
+        self.phone_number = self.getProp('ongair.account')
+        logger.info("Login Failed - %s, reason: %s" %(self.phone_number, entity.getReason()))
 
         # TODO: Where is the notification?
         if entity.getReason() == "not-authorized":
             _session = self.session()
-            self.account.setup = False
+            account = _session.query(Account).filter_by(phone_number=self.phone_number).scalar()
+            account.setup = False       
+            notify_slack("Account %s (%s) failed authentication. " %(account.name, account.phone_number))     
             _session.commit()
 
         sys.exit(0)  # does not restart
