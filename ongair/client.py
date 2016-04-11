@@ -75,6 +75,10 @@ class Client:
             self.logger.exception("Assertion error")
             rollbar.report_exc_info()
             sys.exit(2)
+        except KeyboardInterrupt:
+            # manually stopped. more a development debugging issue
+            self.logger.info("Manually interupted")
+            sys.exit(0)
         except:
             self.logger.exception("Unknown error")
             rollbar.report_exc_info()
