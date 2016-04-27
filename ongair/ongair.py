@@ -242,7 +242,7 @@ class OngairLayer(YowInterfaceLayer):
         """
 
         targets = [ normalizeJid(number) for number in job.targets.split(',') ]
-        outgoingMessage = BroadcastTextMessage(targets, job.args)
+        outgoingMessage = BroadcastTextMessage(targets, job.args.encode('utf8'))
         job.whatsapp_message_id = outgoingMessage.getId()
         self.toLower(outgoingMessage)
 
