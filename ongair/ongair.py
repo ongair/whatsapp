@@ -116,7 +116,7 @@ class OngairLayer(YowInterfaceLayer):
         # Whenever we are pinged by whatsapp, poll the database for pending jobs
         self.work()
 
-        if self.pingCount % 10 == 0:
+        if self.pingCount % 20 == 0:
             logger.info('Send online signal to app.ongair.im')
             self._post('status', {'status': '1', 'message': 'Connected'})
 
