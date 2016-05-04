@@ -261,6 +261,7 @@ class OngairLayer(YowInterfaceLayer):
     def send(self, job, session):
         messageEntity = TextMessageProtocolEntity(job.args.encode('utf8'), to="%s@s.whatsapp.net" % job.targets)
         job.whatsapp_message_id = messageEntity.getId()
+        job.runs += 1
         job.sent = True
         session.commit()
         self.toLower(messageEntity)
@@ -268,6 +269,7 @@ class OngairLayer(YowInterfaceLayer):
     def setProfileStatus(self, job):
         entity = SetStatusIqProtocolEntity(job.args.encode('utf8'))
         self._sendIq(entity, self.onHandleSetProfileStatus, self.onHandleSetProfileStatus)
+        job.runs += 1
         job.sent = True
 
     # This function sets the profile picture
@@ -298,6 +300,7 @@ class OngairLayer(YowInterfaceLayer):
         # send the id
         self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
 
+        job.runs += 1
         job.sent = True
 
 
@@ -342,6 +345,7 @@ class OngairLayer(YowInterfaceLayer):
             logger.info('About to sent the iq')
             self._sendIq(entity, successFn, errorFn)
 
+            job.runs += 1
             job.sent = True
 
     # This function actually sends the image to the target via WhatsApp
