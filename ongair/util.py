@@ -1,7 +1,11 @@
 import os, logging, json, requests, posixpath, urlparse, urllib
+import string, random, urllib2, magic, mimetypes, rollbar, traceback
 
 logger = logging.getLogger(__name__)
 
+# Generate a random file name
+def name_generator(size=20, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 # Get an environment variable
 def get_env(key, raiseError=True, default_value=None):
@@ -14,32 +18,29 @@ def get_env(key, raiseError=True, default_value=None):
     else:
         return value.encode('utf-8')
 
-
-# This function extracts a file name from looking at the last part of the url
-def get_filename(url):
-    path = urlparse.urlsplit(url).path
-    return posixpath.basename(path)
-
-
 # This function downloads a file to the temporary folder and returns the path
-def download(url, name=None):
-    # If no name is provided use the last part of the url
-    if name is None:
-        filename = get_filename(url)
-    else:
-        filename = name
+def download(url):
+    try:
+        image_data = urllib2.urlopen(url).read()
+        with magic.Magic(flags=magic.MAGIC_MIME_TYPE) as mg:
+            mime_type = mg.id_buffer(image_data)
+            mimetypes.init()
+            
+            ext = mimetypes.guess_extension(mime_type)
+            
+            filename = "tmp/%s%s" %(name_generator(), ext)
 
-    logger.info("About to download %s to tmp/%s" % (url, filename))
-    urllib.urlretrieve(url, "tmp/%s" % filename)
-
-    # return the path of the file
-    return "tmp/%s" % filename
-
+            file = open(filename, "w")
+            file.write(image_data)
+            file.close()
+            return filename
+    except Exception as ex:
+        rollbar.report_exc_info()        
+        return None
 
 # This function removes a file from tmp
 def cleanup_file(path):
     os.remove(path)
-
 
 def setup_logging(phone_number):
     # logging.captureWarnings(True)
@@ -53,7 +54,6 @@ def setup_logging(phone_number):
                         datefmt='%m-%d %H:%M',
                         filename="%s/logs/%s.%s.log" % (get_env('pwd'), phone_number, env),
                         filemode='a')
-
 
 def post_to_server(url, phone_number, payload):
     try:
@@ -80,7 +80,6 @@ def send_sms(to, message):
         requests.post(post_url, data={'phone_number': to, 'message': message})
     except:
         logger.info('Error with reaching the url %s' % post_url)
-
 
 def normalizeJid(number):
     if '@' in number:
