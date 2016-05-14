@@ -322,28 +322,29 @@ class OngairLayer(YowInterfaceLayer):
         asset = _session.query(Asset).get(message.asset_id)
         if asset is not None:
             url = asset.url
-            file_name = asset.name
+            
 
-            logger.debug('About to download %s from %s' %(file_name, url)) 
+            logger.debug('About to download %s' %url) 
 
             # download the file
-            path = download(url, file_name)
+            path = download(url)
             logger.debug('File downloaded to %s' %path)
 
-            # get whatsapp username from targets
-            target = normalizeJid(job.targets)
+            if path is not None:
+                # get whatsapp username from targets
+                target = normalizeJid(job.targets)
 
-            # create the upload request entity
-            entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
+                # create the upload request entity
+                entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
 
-            # the success callback
-            successFn = lambda successEntity, originalEntity: self.onRequestUploadSuccess(target, path, successEntity, originalEntity, caption)
+                # the success callback
+                successFn = lambda successEntity, originalEntity: self.onRequestUploadSuccess(target, path, successEntity, originalEntity, caption)
 
-            # The on error callback 
-            errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
+                # The on error callback 
+                errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
 
-            logger.info('About to sent the iq')
-            self._sendIq(entity, successFn, errorFn)
+                logger.info('About to sent the iq')
+                self._sendIq(entity, successFn, errorFn)
 
             job.runs += 1
             job.sent = True
