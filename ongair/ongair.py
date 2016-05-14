@@ -116,7 +116,7 @@ class OngairLayer(YowInterfaceLayer):
         # Whenever we are pinged by whatsapp, poll the database for pending jobs
         self.work()
 
-        if self.pingCount % 10 == 0:
+        if self.pingCount % 20 == 0:
             logger.info('Send online signal to app.ongair.im')
             self._post('status', {'status': '1', 'message': 'Connected'})
 
@@ -261,6 +261,7 @@ class OngairLayer(YowInterfaceLayer):
     def send(self, job, session):
         messageEntity = TextMessageProtocolEntity(job.args.encode('utf8'), to="%s@s.whatsapp.net" % job.targets)
         job.whatsapp_message_id = messageEntity.getId()
+        job.runs += 1
         job.sent = True
         session.commit()
         self.toLower(messageEntity)
@@ -268,6 +269,7 @@ class OngairLayer(YowInterfaceLayer):
     def setProfileStatus(self, job):
         entity = SetStatusIqProtocolEntity(job.args.encode('utf8'))
         self._sendIq(entity, self.onHandleSetProfileStatus, self.onHandleSetProfileStatus)
+        job.runs += 1
         job.sent = True
 
     # This function sets the profile picture
@@ -285,19 +287,21 @@ class OngairLayer(YowInterfaceLayer):
         url = job.args
         path = download(url)
 
-        # load the image
-        src = Image.open(path)        
-        
-        # get two versions. 640 and 96
-        pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
-        picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
+        if path is not None:
+            # load the image
+            src = Image.open(path)        
+            
+            # get two versions. 640 and 96
+            pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
+            picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
 
-        # TODO: For some reason getOwnJid is not appending the domain and this needs to work for setting profile picture
-        iq = SetPictureIqProtocolEntity("%s@s.whatsapp.net" %self.getOwnJid(), picturePreview, pictureData)
+            # TODO: For some reason getOwnJid is not appending the domain and this needs to work for setting profile picture
+            iq = SetPictureIqProtocolEntity("%s@s.whatsapp.net" %self.getOwnJid(), picturePreview, pictureData)
 
-        # send the id
-        self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
+            # send the id
+            self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
 
+        job.runs += 1
         job.sent = True
 
 
@@ -319,29 +323,31 @@ class OngairLayer(YowInterfaceLayer):
         asset = _session.query(Asset).get(message.asset_id)
         if asset is not None:
             url = asset.url
-            file_name = asset.name
+            
 
-            logger.debug('About to download %s from %s' %(file_name, url)) 
+            logger.debug('About to download %s' %url) 
 
             # download the file
-            path = download(url, file_name)
+            path = download(url)
             logger.debug('File downloaded to %s' %path)
 
-            # get whatsapp username from targets
-            target = normalizeJid(job.targets)
+            if path is not None:
+                # get whatsapp username from targets
+                target = normalizeJid(job.targets)
 
-            # create the upload request entity
-            entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
+                # create the upload request entity
+                entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
 
-            # the success callback
-            successFn = lambda successEntity, originalEntity: self.onRequestUploadSuccess(target, path, successEntity, originalEntity, caption)
+                # the success callback
+                successFn = lambda successEntity, originalEntity: self.onRequestUploadSuccess(target, path, successEntity, originalEntity, caption)
 
-            # The on error callback 
-            errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
+                # The on error callback 
+                errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
 
-            logger.info('About to sent the iq')
-            self._sendIq(entity, successFn, errorFn)
+                logger.info('About to sent the iq')
+                self._sendIq(entity, successFn, errorFn)
 
+            job.runs += 1
             job.sent = True
 
     # This function actually sends the image to the target via WhatsApp
