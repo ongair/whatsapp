@@ -288,18 +288,23 @@ class OngairLayer(YowInterfaceLayer):
         path = download(url)
 
         if path is not None:
-            # load the image
-            src = Image.open(path)        
-            
-            # get two versions. 640 and 96
-            pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
-            picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
 
-            # TODO: For some reason getOwnJid is not appending the domain and this needs to work for setting profile picture
-            iq = SetPictureIqProtocolEntity("%s@s.whatsapp.net" %self.getOwnJid(), picturePreview, pictureData)
+            try:
+                # load the image
+                src = Image.open(path)        
+                
+                # get two versions. 640 and 96
+                pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
+                picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
 
-            # send the id
-            self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
+                # TODO: For some reason getOwnJid is not appending the domain and this needs to work for setting profile picture
+                iq = SetPictureIqProtocolEntity("%s@s.whatsapp.net" %self.getOwnJid(), picturePreview, pictureData)
+
+                # send the id
+                self._sendIq(iq, onProfilePictureSuccess, onProfilePictureError)
+            except SystemError as err:
+                # an error most likely with the image resizing
+                logger.info('Error : %s' %str(err))
 
         job.runs += 1
         job.sent = True
