@@ -173,6 +173,7 @@ class OngairLayer(YowInterfaceLayer):
         else:
             url = entity.url
         
+        logger.info("Uploaded file to %s" %url)
         data = {'message': {'url': url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
                             'whatsapp_message_id': id, 'name': name, 'caption': caption }}
         self._post('upload', data)
@@ -432,7 +433,7 @@ class OngairLayer(YowInterfaceLayer):
             self.phone_number = self.getProp('ongair.account')
             self.init()
         elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:
-            logger.info('Disconnected. Will restart exit(2)')
+            logger.info('Disconnected Event. Will restart exit(2)')
             sys.exit(2)
 
     # TODO: Name therapy
@@ -463,6 +464,7 @@ class OngairLayer(YowInterfaceLayer):
     def _post(self, url, payload):
         post_url = get_env('url') + url
         payload.update(account=self.phone_number)
+        logger.info('Sending payload : %s' %payload)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         response = requests.post(post_url, data=json.dumps(payload), headers=headers)
 
