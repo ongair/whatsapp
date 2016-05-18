@@ -22,11 +22,11 @@ pycrypto==2.6.1
 pyOpenSSL==0.15.1
 python-axolotl==0.1.34
 python-axolotl-curve25519==0.1
-python-dateutil==2.5.2
+python-dateutil==2.5.3
 python-dotenv==0.1.5
-pyuploadcare==2.0
-requests==2.8.1
-rollbar==0.11.6
+pyuploadcare==2.0.1
+requests==2.10.0
+rollbar==0.12.1
 semver==2.3.1
 six==1.10.0
 SQLAlchemy==1.0.9

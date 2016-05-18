@@ -177,7 +177,8 @@ class OngairLayer(YowInterfaceLayer):
                 file = open(filename, 'r')
                 response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
                 uploaded_file = pyuploadcare.File(response['file'])
-                uploaded_file.store()
+                # uploaded_file.store()
+                logger.debug("Attempting upload #%s" %attempts)
                 info = uploaded_file.info()
                 attempts += 1
                 url = info['original_file_url']
