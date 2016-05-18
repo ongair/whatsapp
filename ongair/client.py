@@ -69,22 +69,22 @@ class Client:
             # attribute that does not exist
             self.logger.exception("Attribute error")
             rollbar.report_exc_info()
-            sys.exit(2)
+            sys.exit(0)
         except AssertionError:
             # this is a proxy for a wrong expected attribute 
             self.logger.exception("Assertion error")
             rollbar.report_exc_info()
-            sys.exit(2)
+            sys.exit(0)
         except KeyboardInterrupt:
             # manually stopped. more a development debugging issue
             self.logger.info("Manually interupted")
-            sys.exit(0)
+            sys.exit(2)
         except PingTimeoutError:
             self.logger.info("Ping timeout error")
-            sys.exit(0)
+            sys.exit(2)
         except RequestedDisconnectError:
             self.logger.info("We requested to disconnect")
-            sys.exit(0)
+            sys.exit(2)
         except:
             self.logger.exception("Unknown error")
             rollbar.report_exc_info()
