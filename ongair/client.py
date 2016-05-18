@@ -15,7 +15,7 @@ from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
 from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
-# from yowsup.env import YowsupEnv
+from exception import PingTimeoutError, RequestedDisconnectError
 from ongair import OngairLayer
 import sys
 import rollbar
@@ -63,7 +63,7 @@ class Client:
 
         try:
             # Run the asyncore loop
-            stack.loop(timeout=5, discrete=0.5)  # this is the program mainloop
+            stack.loop(timeout=0.5, discrete=0.5)  # this is the program mainloop
         except AttributeError:
             # for now this is a proxy for ProtocolException i.e. where yowsup has tried to read an 
             # attribute that does not exist
@@ -78,6 +78,12 @@ class Client:
         except KeyboardInterrupt:
             # manually stopped. more a development debugging issue
             self.logger.info("Manually interupted")
+            sys.exit(0)
+        except PingTimeoutError:
+            self.logger.info("Ping timeout error")
+            sys.exit(0)
+        except RequestedDisconnectError:
+            self.logger.info("We requested to disconnect")
             sys.exit(0)
         except:
             self.logger.exception("Unknown error")
