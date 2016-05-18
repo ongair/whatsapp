@@ -17,6 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid, notify_slack
 from models import Account, Job, Message, Asset
+from exception import PingTimeoutError, RequestedDisconnectError
 from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
@@ -61,17 +62,23 @@ class OngairLayer(YowInterfaceLayer):
         sys.exit(0)  # does not restart
 
     @ProtocolEntityCallback("message")
-    def onMessage(self, messageProtocolEntity):
-        # send receipts lower
-        self.toLower(messageProtocolEntity.ack())
+    def onMessage(self, messageProtocolEntity):        
 
         if not messageProtocolEntity.isGroupMessage():
             if messageProtocolEntity.getType() == 'text':
                 self.onTextMessage(messageProtocolEntity)
+                # send receipts lower
+                self.toLower(messageProtocolEntity.ack())
             elif messageProtocolEntity.getMediaType() == "image" or messageProtocolEntity.getMediaType() == "video" or messageProtocolEntity.getMediaType() == "audio" :
                 self.onMediaMessage(messageProtocolEntity)
             elif messageProtocolEntity.getMediaType() == "location":
                 self.onLocationMessage(messageProtocolEntity)
+                # send receipts lower
+                self.toLower(messageProtocolEntity.ack())
+        else:
+            # send receipts lower
+            self.toLower(messageProtocolEntity.ack())
+
 
     # This function is called when a receipt is received back from a contact
     @ProtocolEntityCallback("receipt")
@@ -164,18 +171,26 @@ class OngairLayer(YowInterfaceLayer):
             with open(filename, 'wb') as file:
                 file.write(entity.getMediaContent())
 
-            file = open(filename, 'r')
-            response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
-            uploaded_file = pyuploadcare.File(response['file'])
-            uploaded_file.store()
-            info = uploaded_file.info()
-            url = info['original_file_url']
+            attempts = 0
+
+            while(url is None or attempts < 1):
+                file = open(filename, 'r')
+                response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
+                uploaded_file = pyuploadcare.File(response['file'])
+                uploaded_file.store()
+                info = uploaded_file.info()
+                attempts += 1
+                url = info['original_file_url']
         else:
             url = entity.url
         
+        logger.info("Uploaded file to %s" %url)
         data = {'message': {'url': url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
                             'whatsapp_message_id': id, 'name': name, 'caption': caption }}
         self._post('upload', data)
+
+        # send receipts lower
+        self.toLower(entity.ack())
 
         self._sendRealtime({
             'type': entity.getMediaType(),
@@ -432,8 +447,15 @@ class OngairLayer(YowInterfaceLayer):
             self.phone_number = self.getProp('ongair.account')
             self.init()
         elif event.getName() == YowNetworkLayer.EVENT_STATE_DISCONNECTED:
-            logger.info('Disconnected. Will restart exit(2)')
-            sys.exit(2)
+            reason = event.getArg('reason')
+            logger.info('Disconnected Event. Reason: %s.' %reason)
+
+            if reason == "Ping Timeout":
+                raise PingTimeoutError("Ping timeout: %s" %reason)
+            elif reason == "Requested":
+                raise RequestedDisconnectError("Requested disconnect: %s" %reason) 
+            else:
+                sys.exit(2)
 
     # TODO: Name therapy
     def init(self):
@@ -463,6 +485,7 @@ class OngairLayer(YowInterfaceLayer):
     def _post(self, url, payload):
         post_url = get_env('url') + url
         payload.update(account=self.phone_number)
+        logger.info('Sending payload : %s' %payload)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         response = requests.post(post_url, data=json.dumps(payload), headers=headers)
 
