@@ -461,7 +461,7 @@ class OngairLayer(YowInterfaceLayer):
             elif reason == "Requested":
                 raise RequestedDisconnectError("Requested disconnect: %s" %reason) 
             else:
-                sys.exit(2)
+                raise Exception("Unknown exception : %s" %reason)
 
     # TODO: Name therapy
     def init(self):
