@@ -460,7 +460,7 @@ class OngairLayer(YowInterfaceLayer):
                 raise PingTimeoutError("Ping timeout: %s" %reason)
             elif reason == "Requested":
                 raise RequestedDisconnectError("Requested disconnect: %s" %reason) 
-            elif reason == "ConnectionClosedError":
+            elif reason == "Connection Closed":
                 raise ConnectionClosedError("Connection closed")
             else:
                 raise Exception("Unknown exception : %s" %reason)
