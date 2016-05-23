@@ -365,7 +365,7 @@ class OngairLayer(YowInterfaceLayer):
                 # The on error callback 
                 errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
 
-                logger.info('About to sent the iq')
+                logger.debug('About to call send the image send iq')
                 self._sendIq(entity, successFn, errorFn)
 
             job.runs += 1
