@@ -17,7 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid, notify_slack
 from models import Account, Job, Message, Asset
-from exception import PingTimeoutError, RequestedDisconnectError
+from exception import PingTimeoutError, RequestedDisconnectError, ConnectionClosedError
 from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
@@ -460,6 +460,8 @@ class OngairLayer(YowInterfaceLayer):
                 raise PingTimeoutError("Ping timeout: %s" %reason)
             elif reason == "Requested":
                 raise RequestedDisconnectError("Requested disconnect: %s" %reason) 
+            elif reason == "ConnectionClosedError":
+                raise ConnectionClosedError("Connection closed")
             else:
                 raise Exception("Unknown exception : %s" %reason)
 

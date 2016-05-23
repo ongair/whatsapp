@@ -15,7 +15,7 @@ from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
 from yowsup.layers import YowParallelLayer
 from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
-from exception import PingTimeoutError, RequestedDisconnectError
+from exception import PingTimeoutError, RequestedDisconnectError, ConnectionClosedError
 from ongair import OngairLayer
 import sys
 import rollbar
@@ -84,6 +84,9 @@ class Client:
             sys.exit(2)
         except RequestedDisconnectError:
             self.logger.info("We requested to disconnect")
+            sys.exit(2)
+        except ConnectionClosedError:
+            self.logger.info("Disconnected")
             sys.exit(2)
         except:
             self.logger.exception("Unknown error")
