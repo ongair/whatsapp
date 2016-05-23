@@ -3,3 +3,6 @@ class PingTimeoutError(Exception):
 
 class RequestedDisconnectError(Exception):
   pass
+
+class ConnectionClosedError(Exception):
+  pass

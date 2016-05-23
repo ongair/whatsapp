@@ -17,7 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from util import get_env, post_to_server, download, normalizeJid, cleanup_file, strip_jid, notify_slack
 from models import Account, Job, Message, Asset
-from exception import PingTimeoutError, RequestedDisconnectError
+from exception import PingTimeoutError, RequestedDisconnectError, ConnectionClosedError
 from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
@@ -365,7 +365,7 @@ class OngairLayer(YowInterfaceLayer):
                 # The on error callback 
                 errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(target, path, errorEntity, originalEntity)        
 
-                logger.info('About to sent the iq')
+                logger.debug('About to call send the image send iq')
                 self._sendIq(entity, successFn, errorFn)
 
             job.runs += 1
@@ -460,6 +460,8 @@ class OngairLayer(YowInterfaceLayer):
                 raise PingTimeoutError("Ping timeout: %s" %reason)
             elif reason == "Requested":
                 raise RequestedDisconnectError("Requested disconnect: %s" %reason) 
+            elif reason == "Connection Closed":
+                raise ConnectionClosedError("Connection closed")
             else:
                 raise Exception("Unknown exception : %s" %reason)
 
