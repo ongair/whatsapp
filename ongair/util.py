@@ -60,6 +60,7 @@ def post_to_server(url, phone_number, payload):
         post_url = get_env('url') + url
         payload.update(account=phone_number)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        logger.info('Sending payload: %s to url %s' %(payload, post_url))
         response = requests.post(post_url, data=json.dumps(payload), headers=headers)
     except:
         logger.info('Error with reaching the url %s' % url)
