@@ -436,11 +436,12 @@ class OngairLayer(YowInterfaceLayer):
         logger.info('Result from setting the profile %s' % result)
 
     def onGetSyncResult(self, resultSyncIqProtocolEntity, originalIqProtocolEntity):
+        logger.info("Result from sync %s" %resultSyncIqProtocolEntity)
         post_to_server('contacts/sync', self.phone_number, {'registered': resultSyncIqProtocolEntity.outNumbers.keys(),
                                                             'unregistered': resultSyncIqProtocolEntity.invalidNumbers})
 
     def onGetSyncError(self, errorSyncIqProtocolEntity, originalIqProtocolEntity):
-        logger.info(errorSyncIqProtocolEntity)
+        logger.info("Error from sync %s" %errorSyncIqProtocolEntity)
 
     def init_db(self):
         url = get_env('db')
