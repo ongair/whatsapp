@@ -173,7 +173,7 @@ class OngairLayer(YowInterfaceLayer):
 
             attempts = 0
 
-            while(url is None or attempts < 1):
+            while(url is None and attempts < 1):
                 file = open(filename, 'r')
                 response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
                 uploaded_file = pyuploadcare.File(response['file'])
@@ -185,21 +185,23 @@ class OngairLayer(YowInterfaceLayer):
         else:
             url = entity.url
         
-        logger.info("Uploaded file to %s" %url)
-        data = {'message': {'url': url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
-                            'whatsapp_message_id': id, 'name': name, 'caption': caption }}
-        self._post('upload', data)
+        
+        if url is not None:
+            logger.info("Uploaded file to %s" %url)
+            data = {'message': {'url': url, 'message_type': entity.getMediaType().capitalize(), 'phone_number': by,
+                                'whatsapp_message_id': id, 'name': name, 'caption': caption }}
+            self._post('upload', data)            
+
+            self._sendRealtime({
+                'type': entity.getMediaType(),
+                'external_contact_id': by,
+                'url': url,
+                'caption': caption,
+                'name': name            
+            })
 
         # send receipts lower
         self.toLower(entity.ack())
-
-        self._sendRealtime({
-            'type': entity.getMediaType(),
-            'external_contact_id': by,
-            'url': url,
-            'caption': caption,
-            'name': name            
-        })
 
     def onTextMessage(self, entity):
         text = entity.getBody()
