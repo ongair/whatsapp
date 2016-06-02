@@ -22,8 +22,8 @@ from datetime import datetime
 from pubnub import Pubnub
 from PIL import Image
 
-import logging, requests, json, sys, tempfile
-import pyuploadcare
+import logging, requests, json, sys, tempfile, os
+import tinys3
 
 logger = logging.getLogger(__name__)
 
@@ -173,15 +173,19 @@ class OngairLayer(YowInterfaceLayer):
 
             attempts = 0
 
+            key = os.path.basename(filename)
+            logger.info("File key %s" %key)
+
             while(url is None and attempts < 1):
                 file = open(filename, 'r')
-                response = pyuploadcare.api.uploading_request('POST', 'base/', files={ 'file' : file })
-                uploaded_file = pyuploadcare.File(response['file'])
-                # uploaded_file.store()
-                logger.debug("Attempting upload #%s" %attempts)
-                info = uploaded_file.info()
+                conn = tinys3.Connection(get_env('aws_key_id'), get_env('aws_secret_access_key'), tls=True, endpoint=get_env('aws_s3_endpoint'), default_bucket=get_env('aws_s3_bucket'))
+                resp = conn.upload(key, file)
+
+                if resp.status_code == 200:
+                    logger.info("Upload successful")
+                    url = "https://s3-ap-southeast-1.amazonaws.com/ongair-cdn/%s" %key
+
                 attempts += 1
-                url = info['original_file_url']
         else:
             url = entity.url
         
