@@ -5,6 +5,7 @@ docopt==0.4.0
 enum34==1.1.2
 filemagic==1.6
 future==0.15.2
+futures==3.0.5
 idna==2.0
 ipaddress==1.0.16
 mandrill==1.0.57
@@ -29,3 +30,4 @@ rollbar==0.12.1
 semver==2.3.1
 six==1.10.0
 SQLAlchemy==1.0.9
+tinys3==0.1.11
