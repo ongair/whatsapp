@@ -19,7 +19,6 @@ from util import get_env, post_to_server, download, normalizeJid, cleanup_file, 
 from models import Account, Job, Message, Asset
 from exception import PingTimeoutError, RequestedDisconnectError, ConnectionClosedError
 from datetime import datetime
-from pubnub import Pubnub
 from PIL import Image
 
 import logging, requests, json, sys, tempfile, os
@@ -140,13 +139,6 @@ class OngairLayer(YowInterfaceLayer):
         data = { 'location' : { 'latitude' : entity.getLatitude(), 'longitude' : entity.getLongitude(), 'external_contact_id' : by, 'external_message_id' : id, 'name' : name, 'source': 'WhatsApp' }}
         self._post('locations', data)
 
-        self._sendRealtime({
-            'type': 'location',
-            'external_contact_id': by,
-            'name': name,
-            'latitude': entity.getLatitude(),
-            'longitude': entity.getLongitude() 
-        })
 
     # This is called by onMessage when a media type is received
     def onMediaMessage(self, entity):
@@ -196,13 +188,6 @@ class OngairLayer(YowInterfaceLayer):
                                 'whatsapp_message_id': id, 'name': name, 'caption': caption }}
             self._post('upload', data)            
 
-            self._sendRealtime({
-                'type': entity.getMediaType(),
-                'external_contact_id': by,
-                'url': url,
-                'caption': caption,
-                'name': name            
-            })
 
         # send receipts lower
         self.toLower(entity.ack())
@@ -219,12 +204,6 @@ class OngairLayer(YowInterfaceLayer):
                             "name": name}}
         self._post('messages', data)
 
-        self._sendRealtime({
-            'type': 'text',
-            'phone_number': by,
-            'text': text,
-            'name': name
-        })
 
     def work(self):
         _session = self.session()
@@ -477,9 +456,6 @@ class OngairLayer(YowInterfaceLayer):
         # connect to the db
         self.init_db()
 
-        # initialize the realtime notifications lib
-        self._initRealtime()
-
         # load the account from the db
         self.get_account()
 
@@ -503,11 +479,3 @@ class OngairLayer(YowInterfaceLayer):
         logger.info('Sending payload : %s' %payload)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         response = requests.post(post_url, data=json.dumps(payload), headers=headers)
-
-    def _sendRealtime(self, message):
-        self.pubnub.publish(channel=self.channel, message=message)
-
-    def _initRealtime(self):
-        self.channel = "%s_%s" % (get_env('channel'), self.phone_number)
-        self.use_realtime = True
-        self.pubnub = Pubnub(get_env('pub_key'), get_env('sub_key'), None, False)
