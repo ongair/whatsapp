@@ -20,7 +20,6 @@ from ongair import OngairLayer
 import sys
 import rollbar
 import logging
-import pyuploadcare
 
 class Client:
     def __init__(self, phone_number):
@@ -38,9 +37,6 @@ class Client:
 
         # initialize rollbar for exception reporting
         rollbar.init(rollbar_key, environment)
-
-        pyuploadcare.conf.pub_key = get_env('uploadcare_public')
-        pyuploadcare.conf.secret = get_env('uploadcare_secret')
 
     def loop(self):
         # set the yowsup environment - not supported in fork
