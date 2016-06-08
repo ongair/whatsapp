@@ -22,7 +22,8 @@ from datetime import datetime
 from PIL import Image
 
 import logging, requests, json, sys, tempfile, os
-import tinys3
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 
 logger = logging.getLogger(__name__)
 
@@ -165,17 +166,21 @@ class OngairLayer(YowInterfaceLayer):
 
             attempts = 0
 
-            key = os.path.basename(filename)
-            logger.info("File key %s" %key)
+            file_id = "%s/%s" %(self.account.id, os.path.basename(filename))
+            logger.info("File key %s" %file_id)
 
             while(url is None and attempts < 1):
                 file = open(filename, 'r')
-                conn = tinys3.Connection(get_env('aws_key_id'), get_env('aws_secret_access_key'), tls=True, endpoint=get_env('aws_s3_endpoint'), default_bucket=get_env('aws_s3_bucket'))
-                resp = conn.upload(key, file)
+                conn = S3Connection(get_env('aws_key_id'), get_env('aws_secret_access_key'))
+                bucket = conn.get_bucket(get_env('aws_s3_bucket'))
+                
+                key = Key(bucket)
+                key.key = file_id
+                key.set_contents_from_filename(filename)
+                key.set_acl('public-read')
+                url = key.generate_url(expires_in=0, query_auth=False)
 
-                if resp.status_code == 200:
-                    logger.info("Upload successful")
-                    url = "https://s3-ap-southeast-1.amazonaws.com/ongair-cdn/%s" %key
+                logger.info("Uploaded to %s" %url)                
 
                 attempts += 1
         else:
