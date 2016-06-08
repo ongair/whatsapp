@@ -55,6 +55,9 @@ def setup_logging(phone_number):
                         filename="%s/logs/%s.%s.log" % (get_env('pwd'), phone_number, env),
                         filemode='a')
 
+    # reduce boto logging
+    logging.getLogger('boto').setLevel(logging.CRITICAL)
+
 def post_to_server(url, phone_number, payload):
     try:
         post_url = get_env('url') + url
