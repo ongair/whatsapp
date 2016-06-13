@@ -292,7 +292,7 @@ class OngairLayer(YowInterfaceLayer):
         # download the file
         url = job.args
 
-        if url.startswith("//")
+        if url.startswith("//"):
             url = "https:%s" %url
                 
         path = download(url)
@@ -341,7 +341,7 @@ class OngairLayer(YowInterfaceLayer):
             
             logger.debug('About to download %s' %url) 
 
-            if url.startswith("//")
+            if url.startswith("//"):
                 url = "https:%s" %url
 
             # download the file
