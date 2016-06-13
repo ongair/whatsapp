@@ -289,8 +289,12 @@ class OngairLayer(YowInterfaceLayer):
         def onProfilePictureError(errorIqEntity, originalIqEntity):
             logger.error("Error setting the profile picture")
 
-        # downlaod the file
+        # download the file
         url = job.args
+
+        if url.startswith("//")
+            url = "https:%s" %url
+                
         path = download(url)
 
         if path is not None:
@@ -335,8 +339,10 @@ class OngairLayer(YowInterfaceLayer):
         if asset is not None:
             url = asset.url
             
-
             logger.debug('About to download %s' %url) 
+
+            if url.startswith("//")
+                url = "https:%s" %url
 
             # download the file
             path = download(url)
