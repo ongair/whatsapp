@@ -6,6 +6,7 @@ from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocol
 from yowsup.layers.protocol_contacts.protocolentities import GetSyncIqProtocolEntity, ResultSyncIqProtocolEntity
 from yowsup.layers.protocol_receipts.protocolentities import OutgoingReceiptProtocolEntity
 from yowsup.layers.protocol_acks.protocolentities import OutgoingAckProtocolEntity
+from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetPictureIqProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
@@ -39,6 +40,9 @@ class OngairLayer(YowInterfaceLayer):
 
         entity = AvailablePresenceProtocolEntity()
         self.toLower(entity)
+
+        nickname = PresenceProtocolEntity(name=self.account.name)
+        self.toLower(nickname)
 
         self.work()
         self.pingCount = 0
