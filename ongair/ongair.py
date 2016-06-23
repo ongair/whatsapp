@@ -41,7 +41,7 @@ class OngairLayer(YowInterfaceLayer):
         entity = AvailablePresenceProtocolEntity()
         self.toLower(entity)
 
-        nickname = PresenceProtocolEntity(name=self.account.name)
+        nickname = PresenceProtocolEntity(name=self.account.name.encode('utf8'))
         self.toLower(nickname)
 
         self.work()
