@@ -444,9 +444,10 @@ class OngairLayer(YowInterfaceLayer):
         logger.info("Error from sync %s" %errorSyncIqProtocolEntity)
 
     def init_db(self):
-        url = get_env('db')
+        url = get_env('db')        
         self.db = create_engine(url, echo=False, pool_size=1, pool_timeout=600, pool_recycle=600)
         self.session = sessionmaker(bind=self.db)
+        logger.debug("Setup the db connection")
 
     # Event handler for the layer
     def onEvent(self, event):
@@ -473,6 +474,8 @@ class OngairLayer(YowInterfaceLayer):
 
         # load the account from the db
         self.get_account()
+
+        logger.debug("Loaded the account from the database")
 
         if self.account.setup == True:
             self.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS,
