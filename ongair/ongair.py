@@ -215,7 +215,8 @@ class OngairLayer(YowInterfaceLayer):
 
 
     def work(self):
-        _session = self.session()
+        logger.debug("About to work. Checking for ready jobs")
+        _session = self.session()        
         jobs = _session.query(Job).filter_by(sent=False, account_id=self.account.id, pending=False).all()
         logger.info("Number of jobs ready to run %s for account id %s" % (len(jobs), self.account.id))
 
