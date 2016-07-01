@@ -28,7 +28,7 @@ setup(
     author=author,
     install_requires=requirements,
     setup_requires=['pkutils>=0.12.4,<0.13.0'],
-    scripts=['ongair-cli', 'ongair-monitor-cli'],
+    scripts=['ongair-cli', 'ongair-monitor-cli', 'ongair-health-cli'],
     author_email=email,
     description=description,
     packages=find_packages(),
