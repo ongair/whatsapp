@@ -50,6 +50,7 @@ easy_install ongair-whatsapp
 │   ├── starter.py
 │   ├── util.py
 ├── ongair-cli
+├── ongair-health-cli
 ├── ongair_whatsapp.egg-info
 │   ├── PKG-INFO
 │   ├── SOURCES.txt
